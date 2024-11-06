@@ -24,7 +24,16 @@
     text-align: center;
   }
   
-  .form-container, .tab, .dashboard-container form {
+  .tab{
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    width: 80%;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .form-container, .dashboard-container form {
     display: flex;
     flex-direction: column;
     gap: 10px;
@@ -39,6 +48,8 @@
     border: none;
     background-color: #f4f4f4;
     cursor: pointer;
+    color: black;
+    font-size: larger;
   }
   
   .tab button.active {
@@ -46,6 +57,11 @@
     color: #fff;
   }
   
+  .input {
+    display: flex;
+    gap: 3%;
+}
+
   input, button {
     padding: 10px;
     font-size: 16px;
