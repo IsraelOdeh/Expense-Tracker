@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Expense Tracker - Login/Register</title>
+        <link rel="stylesheet" href="css/styles.css">
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    </head>
+
+    <body>
+        <div class="container">
+            <h2>Expense Tracker</h2>
+            <div class="form-container">
+                <div class="tab">
+                    <button id="login-tab" class="active">Login</button>
+                    <button id="register-tab">Register</button>
+                </div>
+
+                <!-- Login Form -->
+                <form id="login-form">
+                    <div id="loginmessage"></div>
+                    <label>Username</label>
+                    <input type="text" name="username" required />
+                    <label>Password</label>
+                    <input type="password" name="password" required />
+                    <button type="submit">Login</button>
+                    <p class="error-message" id="login-error"></p>
+                </form>
+
+                <!-- Register Form -->
+                <form id="register-form" style="display: none;">
+                    <div id="registermessage"></div>
+
+
+
+
+                    <div class="input">
+                        <div class="input-addon">
+                            <i class="material-icons">face</i>
+                        </div>
+                        <input name="firstname" id="firstname" placeholder="Firstname" type="text" required
+                            class="validate" autocomplete="off">
+                    </div>
+
+                    <div class="input">
+                        <div class="input-addon">
+                            <i class="material-icons">face</i>
+                        </div>
+                        <input name="lastname" id="lastname" placeholder="Lastname" type="text" required
+                            class="validate" autocomplete="off">
+                    </div>
+
+                    <div class="input">
+                        <div class="input-addon">
+                            <i class="material-icons">face</i>
+                        </div>
+                        <input name="username" id="username" placeholder="Username" type="text" required
+                            class="validate" autocomplete="off">
+                    </div>
+
+                    <div class="input">
+                        <div class="input-addon">
+                            <i class="material-icons">email</i>
+                        </div>
+                        <input id="email" placeholder="Email" type="email" required class="validate" autocomplete="off">
+                    </div>
+
+
+                    <div class="input">
+                        <div class="input-addon">
+                            <i class="material-icons">email</i>
+                        </div>
+                        <input id="password" placeholder="Password" type="password" required class="validate"
+                            autocomplete="off">
+                    </div>
+
+
+
+
+
+
+
+                    <button type="submit">Register</button>
+                    <p class="error-message" id="register-error"></p>
+                </form>
+            </div>
+        </div>
+
+        <script src="js/auth.js"></script>
+    </body>
+
+</html>

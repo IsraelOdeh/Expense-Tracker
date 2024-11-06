@@ -1,0 +1,138 @@
+* {
+    box-sizing: border-box;
+  }
+  
+  body {
+    font-family: Arial, sans-serif;
+    height: 100vh;
+    background-color: #f4f4f4;
+    margin: 0;
+  }
+  
+  .container, .dashboard-container {
+    width: 100%;
+    max-width: 510px;
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin-left: auto;
+    margin-right: auto;
+  }
+  
+  h2, h3 {
+    text-align: center;
+  }
+  
+  .form-container, .tab, .dashboard-container form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 80%;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  
+  .tab button {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    background-color: #f4f4f4;
+    cursor: pointer;
+  }
+  
+  .tab button.active {
+    background-color: #007BFF;
+    color: #fff;
+  }
+  
+  input, button {
+    padding: 10px;
+    font-size: 16px;
+  }
+  
+  button {
+    background-color: #007BFF;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+  }
+  
+  button:hover {
+    background-color: #0056b3;
+  }
+  
+  .error-message {
+    color: red;
+    font-size: 0.9em;
+    text-align: center;
+  }
+  
+  #entries-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+    overflow-wrap: anywhere;
+  }
+  
+  #entries-table th, #entries-table td {
+    padding: 8px;
+    border: 1px solid #ddd;
+    text-align: center;
+  }
+  
+
+  input#expense, input#income  {
+    appearance: none;
+    position: absolute;
+    height: 30px;
+    width: calc(50% - 10px);
+    z-index: 3;
+  }
+  
+  input#expense  {
+    right: 0;
+  }
+  
+  .option {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+    background: #eee;
+    border-radius: 5px;
+    position: relative;
+  }
+  
+  .option label {
+    width: 50%;
+    text-align: center;
+    cursor: pointer;
+    z-index: 2;
+  }
+  
+  .option::before {
+    content: "";
+    position: absolute;
+    top: 5px;
+    left: 0;
+    background-color: #fff;
+    height: calc(100% - 10px);
+    width: calc(50% - 10px);
+    transform: translateX(5px);
+    border-radius: inherit;
+    box-shadow: 0 2px 2px rgba(0, 0, 0, 0.1);
+    transition: all 200ms;
+  }
+  
+  input#type:checked ~ .option::before {
+    left: 50%;
+  }
+  
+  input#income:checked ~ .option::before {
+    left: 0%;
+  }
+  
+  input#expense:checked ~ .option::before {
+    left: 50%;
+  }

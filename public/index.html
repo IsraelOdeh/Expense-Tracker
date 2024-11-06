@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Dashboard - Expense Tracker</title>
+        <link rel="stylesheet" href="/css/styles.css">
+
+
+
+    </head>
+
+    <body>
+        <main class="dashboard-container">
+            <h2>Welcome to your Dashboard</h2>
+            <button id="logout">Logout</button>
+
+            <!-- Add New Expense/Income -->
+            <h3>Add New Entry</h3>
+            <form id="entry-form">
+                <input type="radio" name="type" class="type" id="income" value="Income" checked required />
+                <input type="radio" name="type" id="expense" class="type" value="Expense" required />
+                <div class="option">
+                    <label for="income">Income</label>
+
+                    <label for="expense">Expense</label>
+                </div>
+                <input type="text" name="description" placeholder="Description" required />
+                <input type="number" name="amount" placeholder="Amount" required />
+                <input type="date" name="date" required />
+
+                <button type="submit">Add</button>
+            </form>
+
+            <!-- Expenses and Income Table -->
+            <h3>Your Entries</h3>
+            <section>
+                <table id="entries-table">
+                    <thead>
+                        <tr>
+                            <th>Description</th>
+                            <th>Amount</th>
+                            <th>Date</th>
+                            <th>Transaction Type</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Entries will be populated here -->
+                        <div id="status" style="text-align: center;"></div>
+                    </tbody>
+                </table>
+            </section>
+        </main>
+
+        <script src="js/index.js"></script>
+    </body>
+
+</html>
