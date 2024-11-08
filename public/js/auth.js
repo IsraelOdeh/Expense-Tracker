@@ -12,9 +12,9 @@ document.getElementById('login-tab').addEventListener('click', () => {
     document.getElementById('register-tab').classList.add('active');
   });
   
+
 async  function login(username,password) {
-    try {
-        
+    try {   
         const response = await fetch('/auth/login', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -58,11 +58,11 @@ async  function login(username,password) {
         body: JSON.stringify({ username, password, firstname, lastname, email })
       });
       const data = await response.json();
-      console.log(data)
-    //   if (data.message) {
-    //     alert('Registration successful');
-    //     window.location.href = 'index.html';
-    //   }
+      // console.log(data)
+      if (data.message) {
+        document.getElementById('message').innerText = data.message;
+        return
+      }
     login(data.username,data.password)
     } catch (error) {
       console.error('Registration failed', error);

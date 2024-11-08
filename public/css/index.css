@@ -1,0 +1,301 @@
+* {
+    box-sizing: border-box;
+  }
+  
+  body {
+    font-family: Arial, sans-serif;
+    height: 100vh;
+    background-color: #f4f4f4;
+    margin: 0;
+  }
+  
+  .container, .dashboard-container {
+    width: 100%;
+    max-width: 510px;
+    background-color: #fff;
+    /* padding: 20px; */
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin-left: auto;
+    margin-right: auto;
+  }
+  
+  .tab{
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    width: 80%;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .form-container, .dashboard-container form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 80%;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+
+#dashboard_section .balance-card{
+    background-color: aqua;
+    width: 80%;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 10px;
+    margin-bottom: 5px;
+}
+
+#dashboard_section .balance-card div{
+    display: grid;
+}
+
+#dashboard_section label{
+    font-size: 20px;
+    font-weight: 400;
+
+}
+
+#dashboard_section span{
+    font-size: 20px;
+    font-weight: 800;
+
+}
+
+#dashboard_section .budget-summary{
+    background-color: aqua;
+    width: fit-content;
+    /* margin-left: auto; */
+    /* margin-right: auto; */
+    padding: 10px;
+}
+
+#budget_section  #budgetForm .category{
+    display: flex;
+    flex-flow: wrap;
+    justify-content: space-between;
+}
+#budget_section  #budgetForm .category input{
+    width: 100px;
+    padding: 0;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+/* Sidebar styling */
+.sidebar {
+    width: 200px;
+    background-color: #333;
+    color: #fff;
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    padding-top: 20px;
+    transition: all 0.3s ease;
+  }
+  
+  .sidebar h2 {
+    text-align: center;
+    margin-bottom: 1rem;
+  }
+  
+  .sidebar button {
+    display: block;
+    color: #fff;
+    padding: 10px 15px;
+    background-color: #333;
+    width: 100%;
+  }
+  
+  .sidebar a:hover {
+    background-color: #555;
+  }
+
+  /* Overlay styling */
+.overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1;
+  }
+  
+  
+  /* Toggle button for mobile */
+  .sidebar-toggle {
+    display: none;
+    font-size: 20px;
+    /* padding: 10px 15px; */
+    background-color: #333;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    /* position: fixed; */
+    /* top: 15px; */
+    /* left: 15px; */
+  }
+  
+  /* Mobile styles */
+  @media (max-width: 768px) {
+    .sidebar {
+      width: fit-content;
+      height: auto;
+      display: none;
+      position: absolute;
+      z-index: 4;
+
+    }
+  
+    .content {
+      margin-left: 0;
+    }
+  
+    .sidebar-toggle {
+        display: block;
+      }
+    
+      .overlay.show {
+        display: block;
+      }
+    
+      .sidebar.show {
+        display: block;
+      }
+
+      .show {
+        display: block!important;
+      }
+  }
+
+
+  .show {
+    display: block!important;
+  }
+
+ 
+  
+  .tab button {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    background-color: #f4f4f4;
+    cursor: pointer;
+    color: black;
+    font-size: larger;
+  }
+  
+  .tab button.active {
+    background-color: #007BFF;
+    color: #fff;
+  }
+  
+  .input {
+    display: flex;
+    gap: 3%;
+}
+
+  input, button {
+    padding: 10px;
+    font-size: 16px;
+  }
+  
+  button {
+    background-color: #007BFF;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+  }
+  
+  button:hover {
+    background-color: #0056b3;
+  }
+  
+  .error-message {
+    color: red;
+    font-size: 0.9em;
+    text-align: center;
+  }
+  
+  #entries-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+    overflow-wrap: anywhere;
+  }
+  
+  #entries-table th, #entries-table td {
+    padding: 8px;
+    border: 1px solid #ddd;
+    text-align: center;
+  }
+  
+
+  input#expense, input#income  {
+    appearance: none;
+    position: absolute;
+    height: 30px;
+    width: calc(50% - 10px);
+    z-index: 3;
+  }
+  
+  input#expense  {
+    right: 0;
+  }
+  
+  .option {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+    background: #eee;
+    border-radius: 5px;
+    position: relative;
+  }
+  
+  .option label {
+    width: 50%;
+    text-align: center;
+    cursor: pointer;
+    z-index: 2;
+  }
+  
+  .option::before {
+    content: "";
+    position: absolute;
+    top: 5px;
+    left: 0;
+    background-color: #fff;
+    height: calc(100% - 10px);
+    width: calc(50% - 10px);
+    transform: translateX(5px);
+    border-radius: inherit;
+    box-shadow: 0 2px 2px rgba(0, 0, 0, 0.1);
+    transition: all 200ms;
+  }
+  
+  input#type:checked ~ .option::before {
+    left: 50%;
+  }
+  
+  input#income:checked ~ .option::before {
+    left: 0%;
+  }
+  
+  input#expense:checked ~ .option::before {
+    left: 50%;
+  }

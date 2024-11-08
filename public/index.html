@@ -5,42 +5,117 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Dashboard - Expense Tracker</title>
-        <link rel="stylesheet" href="/css/styles.css">
-
-
+        <link rel="stylesheet" href="/css/index.css">
 
     </head>
 
     <body>
-        <main class="dashboard-container">
-            <h2>Welcome to your Dashboard</h2>
+
+        <!-- Sidebar container -->
+        <div class="sidebar" id="sidebar">
+            <h2>Menu</h2>
+            <button id="dashboard">Dashboard</button>
+            <button id="add_transaction">Add Expense</button>
+            <button id="view_transaction">View Expenses</button>
+            <button id="budget">Budget</button>
+            <button id="">Settings</button>
             <button id="logout">Logout</button>
+        </div>
 
-            <!-- Add New Expense/Income -->
-            <h3>Add New Entry</h3>
-            <form id="entry-form">
-                <input type="radio" name="type" class="type" id="income" value="Income" checked required />
-                <input type="radio" name="type" id="expense" class="type" value="Expense" required />
-                <div class="option">
-                    <label for="income">Income</label>
+        <!-- Overlay for mobile dropdown -->
+        <div class="overlay" id="overlay"></div>
 
-                    <label for="expense">Expense</label>
+        <!-- Toggle button for mobile -->
+        <button class="sidebar-toggle" id="sidebarToggle">☰ Menu</button>
+
+        <main class="dashboard-container">
+            <!-- <h2>Welcome to your Dashboard</h2> -->
+
+            <section id="dashboard_section" style="display: none;" class="show">
+                <div class="balance-card" style=" text-align: center;">
+                    <div>
+                        <label>Total Balance</label>
+                        <span id="total">$0.00</span>
+                    </div>
+
+                    <div style="display: flex; place-content: center; gap: 20%;">
+                        <div>
+                            <span id="totincome" style="color: rgb(37, 66, 8);">$0.00</span>
+                            <label>Income</label>
+                        </div>
+                        <div>
+                            <span id="totexpense" style="color:rgb(112, 14, 14); ">$0.00</span>
+                            <label>Expense</label>
+                        </div>
+                    </div>
                 </div>
-                <input type="text" name="description" placeholder="Description" required />
-                <input type="number" name="amount" placeholder="Amount" required />
-                <input type="date" name="date" required />
 
-                <button type="submit">Add</button>
-            </form>
+                <div style="display: flex;">
 
+                    <!-- Budget Summary -->
+                    <div class="budget-summary">
+                        <h3>Budget Summary</h3>
+                        <p>Food Budget: $200 used of $300</p>
+                        <!-- More budget categories... -->
+                    </div>
+
+                    <!-- Charts Section -->
+                    <div class="charts">
+                        <div class="pie-chart"> <!-- Pie Chart for Expense Categories --> </div>
+                    </div>
+
+                </div>
+                <!-- Recent Transactions -->
+                <div class="recent-transactions">
+                    <h3>Recent Transactions</h3>
+                    <ul>
+                        <li>Groceries - $50 - Expense</li>
+                        <li>Freelance - $200 - Income</li>
+                        <li>Utility Bill - $100 - Expense</li>
+                        <li>
+                            <button>
+                                More transactions...
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+            </section>
+            <section id="add_transaction_section" style="display: none;">
+                <!-- Add New Expense/Income -->
+                <h3>Add New Entry</h3>
+                <form id="entry-form">
+                    <input type="radio" name="type" class="type" id="income" value="income" checked required />
+                    <input type="radio" name="type" id="expense" class="type" value="expense" required />
+                    <div class="option">
+                        <label for="income">Income</label>
+                        <label for="expense">Expense</label>
+                    </div>
+                    <input type="text" name="description" placeholder="Description" required />
+                    <input type="number" name="amount" placeholder="Amount" required />
+
+                    <select name="category" id="category">
+                        <option value="">-Select Category-</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                        <option value="Other">Other</option>
+                    </select>
+
+                    <input type="date" name="date" required />
+
+                    <button type="submit">Add</button>
+                </form>
+            </section>
             <!-- Expenses and Income Table -->
-            <h3>Your Entries</h3>
-            <section>
+
+            <section id="view_transaction_section" style="display: none;">
+                <h3>Your Entries</h3>
                 <table id="entries-table">
+
                     <thead>
                         <tr>
                             <th>Description</th>
                             <th>Amount</th>
+                            <th>Category</th>
                             <th>Date</th>
                             <th>Transaction Type</th>
                             <th>Actions</th>
@@ -51,6 +126,112 @@
                         <div id="status" style="text-align: center;"></div>
                     </tbody>
                 </table>
+            </section>
+
+            <section id="budget_section" style="display: none;">
+                <div class="budget-form">
+                    <h3>Set Monthly Budget</h3>
+                    <span id="budgetMessage" style=" margin-right: auto; margin-left: auto; display: block; width: fit-content; color: red;
+                "></span>
+                    <form id="budgetForm">
+                        <label>Categories:</label>
+                        <div style=" display: flex; gap: inherit;">
+                            <div style=" display: grid;">
+                                <span>
+                                    <input type="checkbox" value="1" />
+                                    Housing
+                                </span>
+                                <span>
+                                    <input type="checkbox" value="2" />
+                                    Transportation
+                                </span>
+
+                                <span>
+                                    <input type="checkbox" value="3" />
+                                    Food
+                                </span>
+
+                                <span>
+                                    <input type="checkbox" value="4" />
+                                    Health & Medical
+                                </span>
+
+                                <span>
+                                    <input type="checkbox" value="5" />
+                                    Entertainment & Leisure
+                                </span>
+                            </div>
+                            <div style=" display: grid; ">
+                                <span>
+                                    <input type="checkbox" value="6" />
+                                    Personal Care
+                                </span>
+
+                                <span>
+                                    <input type="checkbox" value="7" />
+                                    Education
+                                </span>
+
+                                <span>
+                                    <input type="checkbox" value="8" />
+                                    Savings & Investments
+                                </span>
+
+                                <span>
+                                    <input type="checkbox" value="9" />
+                                    Miscellaneous
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="category">
+
+                            <div id="checkbox1" style="display: none;">
+                                <label for="category">Housing:</label>
+                                <input type="number" name="Housing" id="budgetAmount" required value="0" />
+                            </div>
+                            <div id="checkbox2" style="display: none;">
+                                <label for="category">Transportation:</label>
+                                <input type="number" name="Transportation" id="budgetAmount" required value="0" />
+                            </div>
+                            <div id="checkbox3" style="display: none;">
+                                <label for="category">Food:</label>
+                                <input type="number" name="Food" required value="0" />
+                            </div>
+                            <div id="checkbox4" style="display: none;">
+                                <label for="category">Health & Medical:</label>
+                                <input type="number" name="Health" required value="0" />
+                            </div>
+                            <div id="checkbox5" style="display: none;">
+                                <label for="category">Entertainment & Leisure:</label>
+                                <input type="number" name="Entertainment" required value="0" />
+                            </div>
+                            <div id="checkbox6" style="display: none;">
+                                <label for="category">Personal Care:</label>
+                                <input type="number" name="Personal" required value="0" />
+                            </div>
+                            <div id="checkbox7" style="display: none;">
+                                <label for="category">Education:</label>
+                                <input type="number" name="Education" required value="0" />
+                            </div>
+                            <div id="checkbox8" style="display: none;">
+                                <label for="category">Savings & Investments:</label>
+                                <input type="number" name="Savings" required value="0" />
+                            </div>
+                            <div id="checkbox9" style="display: none;">
+                                <label for="category">Miscellaneous:</label>
+                                <input type="number" name="Miscellaneous" required value="0" />
+                            </div>
+                        </div>
+                        <label for="month">Month:</label>
+                        <input type="number" id="month" min="1" max="12" required />
+
+                        <label for="year">Year:</label>
+                        <input type="number" id="year" min="2024" required />
+
+                        <button type="submit">Set Budget</button>
+                    </form>
+                </div>
             </section>
         </main>
 

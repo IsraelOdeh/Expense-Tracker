@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 const express = require('express');
 const bodyParser = require("body-parser");
 const mysql = require('mysql');
@@ -5,27 +7,8 @@ const path = require('path');
 const bcrypt = require('bcryptjs');  // Import bcrypt for password hashing
 const jwt = require('jsonwebtoken'); // For creating JSON Web Tokens (JWT)
 const cors = require('cors');
-require('dotenv').config();
+const { sql } = require('@vercel/postgres');
 
-
-
-
-// Create a connection to the database
-const connection = mysql.createConnection({
-  host: 'localhost',
-  user: 'root',
-  password: '123456789',
-  database: 'nodedatabase'
-});
-
-// Connect to the database
-connection.connect((err) => {
-  if (err) {
-    console.error('Error connecting: ' + err.stack);
-    return;
-  }
-  console.log('Connected as id ' + connection.threadId);
-});
 
 // Initialize the Express application
 const app = express();
@@ -64,11 +47,13 @@ app.get('/registerpage', (req, res) => {
 // Middleware to verify JWT and extract user information
 const authenticateToken = (req, res, next) => {
     const token = req.header('Authorization')?.split(' ')[1]; // Assuming token is sent as "Bearer <token>"
+    console.log(token);
     if (!token) {
         return res.status(401).json({ message: 'Access denied, token missing!' });
     }
     try {
         const verified = jwt.verify(token, 'strawberryshortcake');
+        console.log(verified)
         req.user = verified;  // req.user will now contain the user ID from the token
         next();
     } catch (error) {
@@ -78,6 +63,7 @@ const authenticateToken = (req, res, next) => {
 
 //Check if user is already logged in
 app.get('/checklogin', authenticateToken, (req, res) => {
+    console.log(req.user);
     res.json(req.user);
 });
 
@@ -86,41 +72,33 @@ app.post('/auth/login',urlencodedParser, async(req, res) => {
     const {username,password} = req.body;
     let dbpassword, dbusername, dbId;
     
-    // Define the SQL query
 
-    const sql = 'SELECT * FROM users WHERE Username  = ?';
+	try {
+		const users = await sql`SELECT username,password,user_id FROM Users WHERE Username  = ${username} ;`;
+		if (users && users.rows.length > 0) {
+            console.log(users.rows)
+            dbusername = users.rows[0].username;
+            dbpassword =  users.rows[0].password;
+            dbId = users.rows[0].user_id;
 
-    // Execute the query
-    connection.query(sql,[username],async (error, rows) => {
-        if (error) {
-            console.error('Query error: ' + error.stack);
-            return;
-        }
-        let results =JSON.parse(JSON.stringify(rows));
-        if(Object.keys(results).length === 0){
-            console.log("nuuu");
-            return res.status(401).json({ message: 'Invalid username Or password' });
-        }
-        dbusername = results[0].Username;
-        dbpassword = results[0].Password;
-        dbId = results[0].Id;
+			//  Compare the hashed password with the password provided by the user
+            const isPasswordValid = await bcrypt.compare(password, dbpassword);
+            //  const hashedPassword = await bcrypt.hash('password1', 10);
+            //  console.log(hashedPassword);
+            if (!isPasswordValid) {
+                return res.status(401).json({ message: 'Invalid username or password' });
+            }
 
-        //  Compare the hashed password with the password provided by the user
-        const isPasswordValid = await bcrypt.compare(password, dbpassword);
-        //  const hashedPassword = await bcrypt.hash('password1', 10);
-        //  console.log(hashedPassword);
-        if (!isPasswordValid) {
-            return res.status(401).json({ message: 'Invalid username or password' });
-        }
-     
-        // If the password is valid, create a token
-        const token = jwt.sign({ id: dbId }, 'strawberryshortcake', { expiresIn: '1h' });
-        res.json({ token });
-
-    });
- 
- 
-    
+            // If the password is valid, create a token
+            const token = jwt.sign({ id: dbId }, 'strawberryshortcake', { expiresIn: '1h' });
+            res.json({ token });
+		    } else {
+		    	return res.status(401).json({ message: 'Invalid username Or password' });
+		    }
+	} catch (error) {
+		console.error(error);
+		res.status(500).send('Error retrieving users');
+	}
        
 });
 
@@ -131,64 +109,89 @@ app.post('/auth/register',urlencodedParser, async(req, res) => {
     // Hash inputted password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Define the SQL query
-    const sql = ' INSERT INTO users (Username, Password, Email, Firstname, Lastname) VALUES (?, ?, ?, ?, ?)';
+    try {
+		const users = await sql`SELECT username,email FROM Users;`;
+		if (users && users.rows.length > 0) {
+            console.log(users.rows);
+             
+           var userMatch =false;
+           var emailMatch =false;
 
-    // Execute the query
-    connection.query(sql,[username, hashedPassword, email, firstname, lastname],async (error, rows) => {
-        if (error) {
-            console.error('Query error: ' + error.stack);
-            if(error.code === 'ER_DUP_ENTRY'){
-                res.status(403).json({ message: 'Username already exists' });
-                return
+            for (var index = 0; index < users.rows.length; ++index) {
+                var row= users.rows[index];
+                if(row.username == username == email){
+                    userMatch = true;
+                    console.log("drtgyhu");
+                    break;
+                }
+                if(row.email == email){
+                    emailMatch = true;
+                    console.log("drtgyhu");
+                    break;
+                }
             }
-        }
-        res.json({username,password });
-    });       
+            if (userMatch == true){
+                res.status(403).json({ message: 'Username already exists' });
+                return;
+            }
+            if (emailMatch == true){
+                res.status(403).json({ message: 'Email is already in use' });
+                return;
+            }
+		} else {
+			res.status(404).send('Error retrieving users');
+		}
+	} catch (error) {
+		console.error(error);
+		res.status(500).send('Error retrieving users');
+	}
+
+    try {
+		await sql`INSERT INTO Users (Username, Password, Email, Firstname, Lastname) VALUES (${username}, ${hashedPassword}, ${email}, ${firstname}, ${lastname});`;
+         res.status(200).json({username,password });
+	} catch (error) {
+		console.error(error);
+		res.status(500).send('Error adding user');
+	}
+
+
+
 });
 
 // GET /expenses - Retrieve all expenses for the authenticated user
-app.get('/expenses', authenticateToken, (req, res) => {
+app.get('/expenses', authenticateToken, async(req, res) => {
     const userId = req.user.id;
-    // Define SQL query
-    const sql = 'SELECT * FROM expenses WHERE userid  = ?';
 
-    // Execute the query
-    connection.query(sql,[userId],async (error, rows) => {
-        if (error) {
-            console.error('Query error: ' + error.stack);
-            return;
-        }
-        let results =JSON.parse(JSON.stringify(rows));
-        if(Object.keys(results).length === 0){
+    try {
+		const users = await sql`SELECT * FROM Transaction WHERE user_id  = ${userId} ORDER BY date DESC;`;
+		if (users && users.rows.length > 0) {
+            res.json(users.rows);
+		} else {
             return res.json({ message: 'User has no Transactions'});
-        }
-        
-        res.json({results});
-
-    });
+		}
+	} catch (error) {
+		console.error(error);
+		res.status(500).send('Error retrieving transactions');
+	}
 });
 
 // POST /expenses - Add a new expense for the authenticated user
-app.post('/api/expenses', authenticateToken, (req, res) => {
-    const { type, amount, name, date } = req.body;
+app.post('/api/expenses', authenticateToken, async(req, res) => {
+    const { type, amount, category, description, date } = req.body;
     console.log(req.body)
-    if (!type || !amount || !name || !date) {
+    if (!type || !amount || !category || !description || !date) {
         return res.status(400).json({ message: 'All fields are required.' });
     }
     // Define user id
     const user_id = req.user.id
-    // Declare SQL Query
-    const sql = 'INSERT INTO expenses (userid,amount,date,description,type) VALUES (?,?,?,?,?)';
-
-    // Execute the query
-    connection.query(sql,[user_id,amount, date, name, type],async (error, rows) => {
-        if (error) {
-            console.error('Query error: ' + error.stack);
-            res.status(403).json({ message: 'Error Encountered' });
-        }
-        res.status(201).json({});;
-    });
+    
+    try {
+		await sql`INSERT INTO Transaction (user_id,amount,date,description,type,category) VALUES (${user_id}, ${amount}, ${date}, ${description}, ${type}, ${category});`;
+		res.status(201).json({});;
+	} catch (error) {
+		console.error(error);
+		res.status(500).send('Error adding transaction');
+	}
 
 });
 
