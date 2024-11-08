@@ -47,23 +47,20 @@ app.get('/registerpage', (req, res) => {
 // Middleware to verify JWT and extract user information
 const authenticateToken = (req, res, next) => {
     const token = req.header('Authorization')?.split(' ')[1]; // Assuming token is sent as "Bearer <token>"
-    console.log(token);
     if (!token) {
         return res.status(401).json({ message: 'Access denied, token missing!' });
     }
     try {
         const verified = jwt.verify(token, 'strawberryshortcake');
-        console.log(verified)
         req.user = verified;  // req.user will now contain the user ID from the token
         next();
     } catch (error) {
-        res.status(403).json({ message: 'Invalid token!' });
-        };      
+        res.status(403).sendFile(path.join(__dirname,'..','public','login.html'))
+    };      
 };
 
 //Check if user is already logged in
 app.get('/checklogin', authenticateToken, (req, res) => {
-    console.log(req.user);
     res.json(req.user);
 });
 
@@ -76,15 +73,12 @@ app.post('/auth/login',urlencodedParser, async(req, res) => {
 	try {
 		const users = await sql`SELECT username,password,user_id FROM Users WHERE Username  = ${username} ;`;
 		if (users && users.rows.length > 0) {
-            console.log(users.rows)
             dbusername = users.rows[0].username;
             dbpassword =  users.rows[0].password;
             dbId = users.rows[0].user_id;
 
 			//  Compare the hashed password with the password provided by the user
             const isPasswordValid = await bcrypt.compare(password, dbpassword);
-            //  const hashedPassword = await bcrypt.hash('password1', 10);
-            //  console.log(hashedPassword);
             if (!isPasswordValid) {
                 return res.status(401).json({ message: 'Invalid username or password' });
             }
@@ -112,7 +106,6 @@ app.post('/auth/register',urlencodedParser, async(req, res) => {
     try {
 		const users = await sql`SELECT username,email FROM Users;`;
 		if (users && users.rows.length > 0) {
-            console.log(users.rows);
              
            var userMatch =false;
            var emailMatch =false;
@@ -121,12 +114,10 @@ app.post('/auth/register',urlencodedParser, async(req, res) => {
                 var row= users.rows[index];
                 if(row.username == username == email){
                     userMatch = true;
-                    console.log("drtgyhu");
                     break;
                 }
                 if(row.email == email){
                     emailMatch = true;
-                    console.log("drtgyhu");
                     break;
                 }
             }
@@ -178,7 +169,6 @@ app.get('/expenses', authenticateToken, async(req, res) => {
 // POST /expenses - Add a new expense for the authenticated user
 app.post('/api/expenses', authenticateToken, async(req, res) => {
     const { type, amount, category, description, date } = req.body;
-    console.log(req.body)
     if (!type || !amount || !category || !description || !date) {
         return res.status(400).json({ message: 'All fields are required.' });
     }
@@ -194,6 +184,58 @@ app.post('/api/expenses', authenticateToken, async(req, res) => {
 	}
 
 });
+
+
+app.post('/api/budget', authenticateToken, async(req, res) => {
+    const {name, budget, month, year } = req.body;
+    console.log(req.body)
+    if (!name || !budget || !month || !year) {
+        return res.status(400).json({ message: 'All fields are required.' });
+    }
+    // Get user id
+    const user_id = req.user.id
+    
+    try {
+		await sql`INSERT INTO Budgets (user_id,name, budget, month, year) VALUES (${user_id}, ${name}, ${budget}, ${month}, ${year});`;
+		res.status(201).json({});;
+	} catch (error) {
+		console.error(error);
+		res.status(500).send('Error adding budget');
+	}
+
+});
+
+
+app.get('/budget', authenticateToken, async(req, res) => {
+    const userId = req.user.id;
+
+    try {
+		const budget = await sql`SELECT * FROM budgets WHERE user_id  = ${userId} ORDER BY created_at DESC;`;
+		if (budget && budget.rows.length > 0) {
+            console.log(budget.rows)
+            let budgetrow = budget.rows;
+            let expenserow = null;
+            try {
+                const users = await sql`SELECT amount, date, category FROM Transaction WHERE user_id  = ${userId} AND type = 'expense';`;
+                if (users && users.rows.length > 0) {
+                    expenserow = users.rows;
+                } 
+                res.json({budgetrow, expenserow});
+            } catch (error) {
+                console.error(error);
+                res.status(500).send('Error retrieving transactions');
+            }
+            
+		} else {
+            return res.json({ message: 'User has no Transactions'});
+		}
+	} catch (error) {
+		console.error(error);
+		res.status(500).send('Error retrieving transactions');
+	}
+});
+
+
 
 // Start the server and listen on the specified port
 app.listen(process.env.PORT, () => console.log(`Server running`));

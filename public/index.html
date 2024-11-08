@@ -94,10 +94,15 @@
                     <input type="number" name="amount" placeholder="Amount" required />
 
                     <select name="category" id="category">
-                        <option value="">-Select Category-</option>
-                        <option value="Male">Male</option>
-                        <option value="Female">Female</option>
-                        <option value="Other">Other</option>
+                        <option value="Housing">Housing</option>
+                        <option value="Transportation">Transportation</option>
+                        <option value="Food">Food</option>
+                        <option value="Health & Medical">Health & Medical</option>
+                        <option value="Entertainment & Leisure">Entertainment & Leisure</option>
+                        <option value="Personal Care">Personal Care</option>
+                        <option value="Education">Education</option>
+                        <option value="Savings & Investments">Savings & Investments</option>
+                        <option value="Miscellaneous">Miscellaneous</option>
                     </select>
 
                     <input type="date" name="date" required />
@@ -129,12 +134,25 @@
             </section>
 
             <section id="budget_section" style="display: none;">
-                <div class="budget-form">
+
+                <span
+                    style="margin-left: auto;margin-right: auto;display: block;width: fit-content;font-size: 17px;font-weight: 700;padding-top: 15px;padding-bottom: 20px;">Your
+                    Budget Plans Are Shown Here
+                </span>
+                <div id="budget_display">
+
+                </div>
+
+                <button onclick="document.getElementById('budget-form').classList.toggle('show')">Add New
+                    Budget</button>
+                <div class="budget-form" id="budget-form" style="display:none">
                     <h3>Set Monthly Budget</h3>
                     <span id="budgetMessage" style=" margin-right: auto; margin-left: auto; display: block; width: fit-content; color: red;
                 "></span>
                     <form id="budgetForm">
-                        <label>Categories:</label>
+                        <label for="name">What would you like to call this budget plan:</label>
+                        <input id="name" name="Name" type="text" maxlength="10" required />
+                        <label>Select relevant categories:</label>
                         <div style=" display: flex; gap: inherit;">
                             <div style=" display: grid;">
                                 <span>
@@ -224,10 +242,23 @@
                             </div>
                         </div>
                         <label for="month">Month:</label>
-                        <input type="number" id="month" min="1" max="12" required />
+                        <select name="Month" id="month">
+                            <option value="Jan">January</option>
+                            <option value="Feb">Febuary</option>
+                            <option value="March">March</option>
+                            <option value="April">April</option>
+                            <option value="May">May</option>
+                            <option value="Jun">June</option>
+                            <option value="Jul">July</option>
+                            <option value="Aug">August</option>
+                            <option value="Sep">September</option>
+                            <option value="Oct">October</option>
+                            <option value="Nov">November</option>
+                            <option value="Dec">December</option>
+                        </select>
 
                         <label for="year">Year:</label>
-                        <input type="number" id="year" min="2024" required />
+                        <input type="number" id="year" name="Year" min="2024" required />
 
                         <button type="submit">Set Budget</button>
                     </form>
