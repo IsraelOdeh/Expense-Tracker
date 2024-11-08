@@ -155,16 +155,26 @@ document.getElementById('budgetForm').addEventListener('submit', (event) => {
 
 checkboxes.forEach(element => {
   element.addEventListener('click',(event) =>{
-    console.log(event.target.value)
+    console.log(event.target)
     document.getElementById('checkbox' + event.target.value).classList.toggle('show');
     child = document.getElementById('checkbox' + event.target.value).children;
-    console.log(child)
-    i = 0;
-    while(i <= child.length) {
-      child[i].setAttribute("value", 1);
+   
+    if(event.target.checked){
+       i = 0;
+       while(i < child.length) {
+        child[i].setAttribute("value", 1);
+        i++;
+      }
+    }
+    else{
+      i = 0;
+      while(i < child.length) {
+       child[i].setAttribute("value", 0);
+       i++;
+     }
     }
        
-    })
+  })
 });
 
 
