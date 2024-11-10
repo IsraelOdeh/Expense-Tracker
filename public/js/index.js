@@ -1,3 +1,6 @@
+// Set variable to store transaction retrieved
+let transaction;
+
 // var chrt = document.getElementById("chartId").getContext("2d");
 //       var chartId = new Chart(chrt, {
 //          type: 'pie',
@@ -18,18 +21,50 @@
 
 // const token = localStorage.getItem('token');
 
-const sidebar = document.getElementById("sidebar");
-const overlay = document.getElementById("overlay");
-const sidebarToggle = document.getElementById("sidebarToggle");
+
+
 
 // Function to toggle sidebar and overlay
 function toggleSidebar() {
+  const sidebar = document.getElementById("sidebar");
+  const overlay = document.getElementById("overlay");
   sidebar.classList.toggle("show");
   overlay.classList.toggle("show");
 }
 
+function navMenu(heading) {
+  if (heading=='dashboard') {
+    document.getElementById('dashboard_section').classList.add('show');
+    document.getElementById('add_transaction_section').classList.remove('show');
+    document.getElementById('view_transaction_section').classList.remove('show');
+    document.getElementById('budget_section').classList.remove('show');
+    toggleSidebar()
+  }
+  if (heading=='add_transaction') {
+    document.getElementById('add_transaction_section').classList.add('show');
+    document.getElementById('dashboard_section').classList.remove('show');
+    document.getElementById('view_transaction_section').classList.remove('show');
+    document.getElementById('budget_section').classList.remove('show');
+    toggleSidebar()
+  }
+  if (heading=='view_transaction'){
+    document.getElementById('view_transaction_section').classList.add('show');
+    document.getElementById('dashboard_section').classList.remove('show');
+    document.getElementById('add_transaction_section').classList.remove('show');
+    document.getElementById('budget_section').classList.remove('show');
+    toggleSidebar()
+  }
+  if (heading=='budget'){
+    document.getElementById('budget_section').classList.add('show');
+    document.getElementById('view_transaction_section').classList.remove('show');
+    document.getElementById('dashboard_section').classList.remove('show');
+    document.getElementById('add_transaction_section').classList.remove('show');
+    toggleSidebar()
+  }
+}
+
 // Toggle sidebar on button click
-sidebarToggle.addEventListener("click", toggleSidebar);
+document.getElementById("sidebar_toggle").addEventListener("click", toggleSidebar);
 
 // Close sidebar when clicking outside on the overlay
 overlay.addEventListener("click", toggleSidebar);
@@ -83,17 +118,16 @@ async function fetchEntries() {
     displayEntries(entries);
   }
   
-  let transaction ;
   function displayEntries(entries) {
     transaction = entries;
-    const tableBody = document.getElementById('entries-table').querySelector('tbody');
+    const tableBody = document.getElementById('entries_table').querySelector('tbody');
     tableBody.innerHTML = '';
     let total = 0;
-    let totincome = 0;
-    let totexpense = 0;
+    let total_income = 0;
+    let total_expense = 0;
 
     index = 0;
-    recents = document.getElementById('recent-transactions');
+    recents = document.getElementById('recent_transactions');
     recents.innerHTML = '';
     entries.forEach(entry => {
       entry.date = new Date(Date.parse(entry.date))
@@ -103,7 +137,7 @@ async function fetchEntries() {
         console.log(index)
         recents.innerHTML +=`
           <li style="display: flex;justify-content: space-between;">
-            <p> ${entry.description}</span> <p> ${(entry.type = 'expense'? '-':'+' )}${entry.amount}
+            <p> ${entry.description}</span> <p> ${(entry.type == 'expense'? '-':'+' )}${entry.amount}
           </li>
         `
         index++;
@@ -112,7 +146,8 @@ async function fetchEntries() {
         console.log(index)
         recents.innerHTML +=`
           <li>
-            <button>
+    
+            <button onclick="navMenu('view_transaction');toggleSidebar()">
               More transactions...
             </button>
           </li>
@@ -122,11 +157,11 @@ async function fetchEntries() {
 
 
       if(entry.type === 'income'){
-        totincome += Number(entry.amount);
+        total_income += Number(entry.amount);
         total += Number(entry.amount)
       }
       else{
-        totexpense += Number(entry.amount);
+        total_expense += Number(entry.amount);
         total -= Number(entry.amount);
       }
 
@@ -139,24 +174,23 @@ async function fetchEntries() {
         <td>${entry.type}</td>
 
         <td>
-          <button onclick="editEntry(${entry.trans_id})">Edit</button>
+          <button onclick="editEntry(${entry.trans_id},)">Edit</button>
           <button onclick="deleteEntry(${entry.trans_id})">Delete</button>
         </td>
       `;
       tableBody.appendChild(row);
     });
     document.getElementById('total').textContent = `$${total}`;
-    document.getElementById('totincome').textContent = `$${totincome}`;
-    document.getElementById('totexpense').textContent = `$${totexpense}`;
+    document.getElementById('total_income').textContent = `$${total_income}`;
+    document.getElementById('total_expense').textContent = `$${total_expense}`;
 
 
   }
-  
-  
+
   async function editEntry(id,entry){
     let filteredValues = transaction.filter(item => item.trans_id === id)
     console.log(filteredValues);
-    form = document.getElementById('edit-entry-form');
+    form = document.getElementById('edit_entry_form');
     form.innerHTML = ''
     form.innerHTML += `
       <input type = "hidden" value=${filteredValues[0].trans_id} name="trans_id">
@@ -185,19 +219,7 @@ async function fetchEntries() {
 
       <button type="submit">Add</button>
     `
-    // const token = localStorage.getItem('token');
-    // await fetch('/api/editexpenses', {
-    //   method: 'POST',
-    //   headers: {
-    //     'Authorization': `Bearer ${token}`,
-    //     'Content-Type': 'application/json'
-    //   },
-    //   body: JSON.stringify({ description, amount, date, type, category })
-    // });
-    // fetchEntries();
   }
-
-
 
   async function addEntry(description, amount,category,date,type)  {
     const token = localStorage.getItem('token');
@@ -212,7 +234,6 @@ async function fetchEntries() {
     fetchEntries();
   }
 
-  
   async function updateEntry(description, amount,category,date,type,id)  {
     const token = localStorage.getItem('token');
     await fetch('/api/editexpenses', {
@@ -226,28 +247,40 @@ async function fetchEntries() {
     fetchEntries();
   }
 
-
-  function displayBudget(entries) {
-    this_year = new Date().getFullYear();
-    this_month = new Date().getMonth() +1;
-    console.log(this_year+':'+this_month)
-
+  function getMonthinWords(nummonth) {
     month_array = {'1':'Jan', '2':'Feb', '3':'Mar', '4':'Apr', '5':'May', '6':'Jun', '7':'Jul','8': 'Aug', '9':'Sep', '10':'Oct', '11': 'Nov', '12':'Dec'} 
     
-    this_month = String(this_month)
-    this_month = month_array[this_month]
-    let filteredValues = entries.budgetrow.filter(item => item.month === this_month && item.year === this_year)
+    Wmonth = String(nummonth)
+    Wmonth = month_array[Wmonth]
+    return(Wmonth)
+  }
+
+  function budgetString2array(budget){
     array = {}
-    filteredValues[0].budget.split(',').forEach((pair) =>{
+    console.log(budget)
+    budget.split(',').forEach((pair) =>{
       const [key,value] = pair.split(':')
       array[key] = value;
     });
+    return array;
+  }
+
+  function getCurrentBudget(row){
+    let filteredValues = row.filter(item => item.month === this_month && item.year === this_year)
+    budgetArray = budgetString2array(filteredValues[0].budget)
     totalBudget = 0;
-    Object.keys(array).forEach(element =>{
-        totalBudget += Number(array[element])
+    Object.keys(budgetArray).forEach(element =>{
+        totalBudget += Number(budgetArray[element])
     })
     console.log(totalBudget)
-    console.log(entries)
+    console.log(row)
+    return ;
+  }
+  function displayBudget(entries) {
+    this_year = new Date().getFullYear();
+    this_month = getMonthinWords(new Date().getMonth() +1)
+
+    getCurrentBudget(entries.budgetrow);
     
     let Body = document.getElementById('budget_display');
         Body.innerHTML = ""
@@ -262,10 +295,10 @@ async function fetchEntries() {
       //</div>
 
       Body.innerHTML += `
-        <div style="width: 60%;display: flex;align-items: center;justify-content: space-between; margin-left: auto;margin-right: auto;">
+        <div style="width: 90%;display: flex;align-items: center;justify-content: space-between; margin-left: auto;margin-right: auto; max-width: 300px">
           
           <span style="font-weight: 800;text-transform: capitalize;">${entry.name}</span>
-          <div>
+          <div     style="display: flex;justify-content: space-between;width: 60%;align-items: center;">
             <span style="margin-right: 40px;">${budget_date}</span>
             <button onclick="document.getElementById(${entry.budget_id}).classList.toggle('show')">View</button>
           </div>
@@ -274,28 +307,21 @@ async function fetchEntries() {
         </div>
       `;
 
-      array = {}
-      entry.budget.split(',').forEach((pair) =>{
-        const [key,value] = pair.split(':')
-        array[key] = value;
-      });
-
+      entry.budget = budgetString2array(entry.budget);
       Body = document.getElementById(entry.budget_id);
       Body.innerHTML = ''
-      entry.budget = array;
       console.log(entry.budget);
       Object.keys(entry.budget).forEach(key =>{
 
         totalSpent = 0;
         entries.expenserow.forEach(expense =>{
 
-          month_array = {'1':'Jan', '2':'Feb', '3':'Mar', '4':'Apr', '5':'May', '6':'Jun', '7':'Jul','8': 'Aug', '9':'Sep', '10':'Oct', '11': 'Nov', '12':'Dec'}
           expense.date = new Date(Date.parse(expense.date));
           
           year = expense.date.getUTCFullYear() 
           
-          month = String(expense.date.getUTCMonth() + 1 )
-          month = month_array[month]
+          month = expense.date.getUTCMonth() + 1;
+          month = getMonthinWords(month)
           // entry.date = entry.date.getUTCFullYear() +  "/" + (entry.date.getUTCMonth() + 1) + "/" + entry.date.getUTCDate();
 
           if(expense.category == key && month == entry.month && year == entry.year){
@@ -346,8 +372,7 @@ async function fetchEntries() {
     fetchBudget();
   }
 
-  
-  document.getElementById('entry-form').addEventListener('submit', (event) => {
+  document.getElementById('entry_form').addEventListener('submit', (event) => {
     event.preventDefault();
     const description = event.target.description.value;
     const amount = event.target.amount.value;
@@ -357,7 +382,7 @@ async function fetchEntries() {
     addEntry(description, amount, category, date,type);
   });
   
-  document.getElementById('edit-entry-form').addEventListener('submit', (event) =>{
+  document.getElementById('edit_entry_form').addEventListener('submit', (event) =>{
     event.preventDefault();
     const id = event.target.trans_id.value;
     const description = event.target.description.value;
@@ -372,6 +397,7 @@ checkboxes = document.getElementById('budget_section').querySelectorAll('input[t
 
 document.getElementById('budgetForm').addEventListener('submit', (event) => {
   event.preventDefault();
+  document.getElementById("budgetMessage").textContent = ""
   isChecked = 0;
   checkboxes.forEach(element => {
     if(element.checked){
@@ -382,27 +408,42 @@ document.getElementById('budgetForm').addEventListener('submit', (event) => {
   if(isChecked>0){
     const budget = `Housing:${event.target.Housing.value},Transportation:${event.target.Transportation.value},Food:${event.target.Food.value},Health & Medical:${event.target.Health.value},Entertainment & Leisure:${event.target.Entertainment.value},Personal Care:${event.target.Personal.value},Education:${event.target.Education.value},Savings & Investments:${event.target.Savings.value},Miscellaneous:${event.target.Miscellaneous.value}`;
 
-    console.log(budget)
     const month = event.target.Month.value;
     const year = event.target.Year.value;
     const name = event.target.Name.value
-    addBudget(name,budget,month,year);
+
+    inputboxes.forEach(input =>{
+      console.log(input)
+      input.classList.remove('show');
+      child = input.children;
+      i = 0;
+      while(i < child.length) {
+        child[i].value = 0
+        i++;
+      }
+    })
+    
+    event.target.reset()
+    document.getElementById('budget_form').classList.toggle('show'); 
+    document.getElementById('budget_overlay').classList.toggle('show')
+
+    // addBudget(name,budget,month,year);
   }
   else{
     document.getElementById("budgetMessage").textContent = "Select at least 1 category to budget"
   }
 });
 
+inputboxes = document.getElementById('budget_section').querySelectorAll('div[class=categoryAmount]');
 checkboxes.forEach(element => {
   element.addEventListener('click',(event) =>{
-    console.log(event.target)
     document.getElementById('checkbox' + event.target.value).classList.toggle('show');
     child = document.getElementById('checkbox' + event.target.value).children;
    
     if(event.target.checked){
        i = 0;
        while(i < child.length) {
-        child[i].value= 1;
+        child[i].value= '';
         i++;
       }
     }
@@ -418,39 +459,8 @@ checkboxes.forEach(element => {
   })
 });
 
-
   document.getElementById('logout').addEventListener('click', () => {
     localStorage.removeItem('token');
     toggleSidebar()
     window.location = "/loginpage";
-  });
-
-  document.getElementById('dashboard').addEventListener('click', () => {
-    document.getElementById('dashboard_section').classList.add('show');
-    document.getElementById('add_transaction_section').classList.remove('show');
-    document.getElementById('view_transaction_section').classList.remove('show');
-    document.getElementById('budget_section').classList.remove('show');
-    toggleSidebar()
-  });
-  document.getElementById('add_transaction').addEventListener('click', () => {
-    document.getElementById('add_transaction_section').classList.add('show');
-    document.getElementById('dashboard_section').classList.remove('show');
-    document.getElementById('view_transaction_section').classList.remove('show');
-    document.getElementById('budget_section').classList.remove('show');
-    toggleSidebar()
-  });
-  document.getElementById('view_transaction').addEventListener('click', () => {
-    document.getElementById('view_transaction_section').classList.add('show');
-    document.getElementById('dashboard_section').classList.remove('show');
-    document.getElementById('add_transaction_section').classList.remove('show');
-    document.getElementById('budget_section').classList.remove('show');
-    toggleSidebar()
-  });
-
-  document.getElementById('budget').addEventListener('click', () => {
-    document.getElementById('budget_section').classList.add('show');
-    document.getElementById('view_transaction_section').classList.remove('show');
-    document.getElementById('dashboard_section').classList.remove('show');
-    document.getElementById('add_transaction_section').classList.remove('show');
-    toggleSidebar()
   });

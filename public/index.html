@@ -9,30 +9,32 @@
 
     </head>
 
-    <body>
+    <body style=="min-width: 300px;">
 
         <!-- Sidebar container -->
         <div class="sidebar" id="sidebar">
             <h2>Menu</h2>
-            <button id="dashboard">Dashboard</button>
-            <button id="add_transaction">Add Expense</button>
-            <button id="view_transaction">View Expenses</button>
-            <button id="budget">Budget</button>
-            <button id="">Settings</button>
-            <button id="logout">Logout</button>
+            <button onclick="navMenu('dashboard')">Dashboard</button>
+            <button onclick="navMenu('add_transaction')">Add Expense</button>
+            <button onclick="navMenu('view_transaction')">View Expenses</button>
+            <button onclick="navMenu('budget')">Budget</button>
+            <button>Settings</button>
+            <button id='logout'>Logout</button>
         </div>
 
         <!-- Overlay for mobile dropdown -->
         <div class="overlay" id="overlay"></div>
 
         <!-- Toggle button for mobile -->
-        <button class="sidebar-toggle" id="sidebarToggle">☰ Menu</button>
-
-        <main class="dashboard-container">
+        <nav>
+            <button class="sidebar_toggle" id="sidebar_toggle">☰ Menu</button>
+            <div style="height: 47px;background: #333;width: 100%;"></div>
+        </nav>
+        <main class="dashboard_container">
             <!-- <h2>Welcome to your Dashboard</h2> -->
 
             <section id="dashboard_section" style="display: none;" class="show">
-                <div class="balance-card" style=" text-align: center;">
+                <div class="balance_card" style=" text-align: center;">
                     <div>
                         <label>Total Balance</label>
                         <span id="total">$0.00</span>
@@ -40,40 +42,28 @@
 
                     <div style="display: flex; place-content: center; gap: 20%;">
                         <div>
-                            <span id="totincome" style="color: rgb(37, 66, 8);">$0.00</span>
+                            <span id="total_income" style="color: rgb(37, 66, 8);">$0.00</span>
                             <label>Income</label>
                         </div>
                         <div>
-                            <span id="totexpense" style="color:rgb(112, 14, 14); ">$0.00</span>
+                            <span id="total_expense" style="color:rgb(112, 14, 14); ">$0.00</span>
                             <label>Expense</label>
                         </div>
                     </div>
                 </div>
-
-                <div style="display: flex;">
-
+                <div style="display: flex; gap: 10px;">
                     <!-- Budget Summary -->
-                    <div class="budget-summary">
+                    <div class="budget_summary">
                         <h3>Budget Summary</h3>
                         <p>Food Budget: $200 used of $300</p>
                         <!-- More budget categories... -->
                     </div>
                     <!-- Recent Transactions -->
-                    <div class="recent-transactions">
+                    <div class="recent_transactions">
                         <h3>Recent Transactions</h3>
-                        <ul id="recent-transactions">
-                            <li>Groceries - $50 - Expense</li>
-                            <li>Freelance - $200 - Income</li>
-                            <li>Utility Bill - $100 - Expense</li>
-                            <li>
-                                <button>
-                                    More transactions...
-                                </button>
-                            </li>
+                        <ul id="recent_transactions">
                         </ul>
                     </div>
-
-
                 </div>
                 <!-- Charts Section -->
                 <div class="charts">
@@ -81,10 +71,11 @@
                 </div>
 
             </section>
+
             <section id="add_transaction_section" style="display: none;">
                 <!-- Add New Expense/Income -->
                 <h3>Add New Entry</h3>
-                <form id="entry-form">
+                <form id="entry_form">
                     <input type="radio" name="type" class="type" id="income" value="income" checked required />
                     <input type="radio" name="type" id="expense" class="type" value="expense" required />
                     <div class="option">
@@ -111,45 +102,44 @@
                     <button type="submit">Add</button>
                 </form>
             </section>
-            <!-- Expenses and Income Table -->
 
             <section id="view_transaction_section" style="display: none;">
                 <h3>Your Entries</h3>
-                <table id="entries-table">
-
-                    <thead>
-                        <tr>
-                            <th>Description</th>
-                            <th>Amount</th>
-                            <th>Category</th>
-                            <th>Date</th>
-                            <th>Transaction Type</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <!-- Entries will be populated here -->
-                        <div id="status" style="text-align: center;"></div>
-                    </tbody>
-                </table>
+                <div style=" overflow-x: scroll; ">
+                    <table id="entries_table" style="overflow-wrap: normal;">
+                        <thead>
+                            <tr>
+                                <th>Description</th>
+                                <th>Amount</th>
+                                <th>Category</th>
+                                <th>Date</th>
+                                <th>Transaction Type</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Entries will be populated here -->
+                            <div id="status" style="text-align: center;"></div>
+                        </tbody>
+                    </table>
+                </div>
                 <div class="overlay"></div>
-                <form id="edit-entry-form">
-
-                </form>
+                <form id="edit_entry_form"></form>
             </section>
 
             <section id="budget_section" style="display: none;">
-
                 <span
-                    style="margin-left: auto;margin-right: auto;display: block;width: fit-content;font-size: 17px;font-weight: 700;padding-top: 15px;padding-bottom: 20px;">Your
-                    Budget Plans Are Shown Here
+                    style="margin-left: auto;margin-right: auto;display: block;width: fit-content;font-size: 17px;font-weight: 700;padding-top: 15px;padding-bottom: 20px;">
+                    Your Budget Plans Are Shown Here
                 </span>
                 <div id="budget_display">
                 </div>
 
-                <button onclick="document.getElementById('budget-form').classList.toggle('show')">Add New
-                    Budget</button>
-                <div class="budget-form" id="budget-form" style="display:none">
+                <button onclick="document.getElementById('budget_form').classList.toggle('show'); 
+                document.getElementById('budget_overlay').classList.toggle('show')">
+                    Add New Budget
+                </button>
+                <div class="budget_form" id="budget_form" style="display:none">
                     <h3>Set Monthly Budget</h3>
                     <span id="budgetMessage" style=" margin-right: auto; margin-left: auto; display: block; width: fit-content; color: red;
                 "></span>
@@ -208,39 +198,39 @@
 
                         <div class="category">
 
-                            <div id="checkbox1" style="display: none;">
+                            <div class="categoryAmount" id="checkbox1" style="display: none;">
                                 <label for="category">Housing:</label>
-                                <input type="number" name="Housing" id="budgetAmount" required value="0" />
+                                <input type="number" name="Housing" required value="0" />
                             </div>
-                            <div id="checkbox2" style="display: none;">
+                            <div class="categoryAmount" id="checkbox2" style="display: none;">
                                 <label for="category">Transportation:</label>
-                                <input type="number" name="Transportation" id="budgetAmount" required value="0" />
+                                <input type="number" name="Transportation" required value="0" />
                             </div>
-                            <div id="checkbox3" style="display: none;">
+                            <div class="categoryAmount" id="checkbox3" style="display: none;">
                                 <label for="category">Food:</label>
                                 <input type="number" name="Food" required value="0" />
                             </div>
-                            <div id="checkbox4" style="display: none;">
+                            <div class="categoryAmount" id="checkbox4" style="display: none;">
                                 <label for="category">Health & Medical:</label>
                                 <input type="number" name="Health" required value="0" />
                             </div>
-                            <div id="checkbox5" style="display: none;">
+                            <div class="categoryAmount" id="checkbox5" style="display: none;">
                                 <label for="category">Entertainment & Leisure:</label>
                                 <input type="number" name="Entertainment" required value="0" />
                             </div>
-                            <div id="checkbox6" style="display: none;">
+                            <div class="categoryAmount" id="checkbox6" style="display: none;">
                                 <label for="category">Personal Care:</label>
                                 <input type="number" name="Personal" required value="0" />
                             </div>
-                            <div id="checkbox7" style="display: none;">
+                            <div class="categoryAmount" id="checkbox7" style="display: none;">
                                 <label for="category">Education:</label>
                                 <input type="number" name="Education" required value="0" />
                             </div>
-                            <div id="checkbox8" style="display: none;">
+                            <div class="categoryAmount" id="checkbox8" style="display: none;">
                                 <label for="category">Savings & Investments:</label>
                                 <input type="number" name="Savings" required value="0" />
                             </div>
-                            <div id="checkbox9" style="display: none;">
+                            <div class="categoryAmount" id="checkbox9" style="display: none;">
                                 <label for="category">Miscellaneous:</label>
                                 <input type="number" name="Miscellaneous" required value="0" />
                             </div>
@@ -266,6 +256,10 @@
 
                         <button type="submit">Set Budget</button>
                     </form>
+
+                </div>
+                <div class="overlay" id="budget_overlay"
+                    onclick="document.getElementById('budget_form').classList.toggle('show'); document.getElementById('budget_overlay').classList.toggle('show')">
                 </div>
             </section>
         </main>

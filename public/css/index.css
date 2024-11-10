@@ -9,7 +9,11 @@
     margin: 0;
   }
   
-  .container, .dashboard-container {
+  h3 {
+    margin-top: 0;
+}
+
+  .container, .dashboard_container {
     width: 100%;
     max-width: 510px;
     background-color: #fff;
@@ -18,6 +22,7 @@
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     margin-left: auto;
     margin-right: auto;
+    margin-top: 70px;
   }
   
   .tab{
@@ -29,7 +34,7 @@
     margin-right: auto;
   }
 
-  .form-container, .dashboard-container form {
+  .form_container, .dashboard_container form {
     display: flex;
     flex-direction: column;
     gap: 10px;
@@ -39,7 +44,7 @@
   }
 
 
-#dashboard_section .balance-card{
+#dashboard_section .balance_card{
     background-color: aqua;
     width: 80%;
     margin-left: auto;
@@ -48,7 +53,7 @@
     margin-bottom: 5px;
 }
 
-#dashboard_section .balance-card div{
+#dashboard_section .balance_card div{
     display: grid;
 }
 
@@ -64,7 +69,7 @@
 
 }
 
-#dashboard_section .budget-summary,.recent-transactions{
+#dashboard_section .budget_summary,.recent_transactions{
     background-color: aqua;
     width: 100%;
     /* margin-left: auto; */
@@ -82,7 +87,13 @@
     padding: 0;
 }
 
-
+#budget_section #budget_form {
+  top: 70px;
+  position: fixed;
+  z-index: 5;
+  right: 20%;
+  background: #606060;
+}
 
 
 
@@ -135,9 +146,16 @@
     z-index: 1;
   }
   
+  nav{
+    position: fixed;
+    width: 100%;
+    display: flex;
+    top: 0;
+    z-index: 6;
+  }
   
   /* Toggle button for mobile */
-  .sidebar-toggle {
+  .sidebar_toggle {
     display: none;
     font-size: 20px;
     /* padding: 10px 15px; */
@@ -145,7 +163,8 @@
     color: #fff;
     border: none;
     cursor: pointer;
-    /* position: fixed; */
+
+    text-wrap-mode: nowrap;
     /* top: 15px; */
     /* left: 15px; */
   }
@@ -156,7 +175,7 @@
       width: fit-content;
       height: auto;
       display: none;
-      position: absolute;
+      position: fixed;
       z-index: 4;
 
     }
@@ -165,7 +184,7 @@
       margin-left: 0;
     }
   
-    .sidebar-toggle {
+    .sidebar_toggle {
         display: block;
       }
     
@@ -189,7 +208,7 @@
   #overlay{
     display: none!important;
   }
-  .dashboard-container {
+  .dashboard_container {
     margin-top: 40px;
   
 }
@@ -240,20 +259,20 @@ body{
     background-color: #0056b3;
   }
   
-  .error-message {
+  .error_message {
     color: red;
     font-size: 0.9em;
     text-align: center;
   }
   
-  #entries-table {
+  #entries_table {
     width: 100%;
     border-collapse: collapse;
     margin-top: 10px;
     overflow-wrap: anywhere;
   }
   
-  #entries-table th, #entries-table td {
+  #entries_table th, #entries_table td {
     padding: 8px;
     border: 1px solid #ddd;
     text-align: center;
