@@ -9,7 +9,7 @@
     margin: 0;
   }
   
-  .container, .dashboard-container {
+  .container {
     width: 100%;
     max-width: 510px;
     background-color: #fff;
@@ -33,7 +33,7 @@
     margin-right: auto;
   }
 
-  .form-container, .dashboard-container form {
+  .form-container form {
     display: flex;
     flex-direction: column;
     gap: 10px;
@@ -57,14 +57,11 @@
     color: #fff;
   }
   
-  .input {
-    display: flex;
-    gap: 3%;
-}
 
   input, button {
     padding: 10px;
     font-size: 16px;
+    margin-bottom: 20px;
   }
   
   button {
@@ -83,51 +80,12 @@
     font-size: 0.9em;
     text-align: center;
   }
-  
-  #entries-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 10px;
-    overflow-wrap: anywhere;
-  }
-  
-  #entries-table th, #entries-table td {
-    padding: 8px;
-    border: 1px solid #ddd;
-    text-align: center;
-  }
+
+
+
   
 
-  input#expense, input#income  {
-    appearance: none;
-    position: absolute;
-    height: 30px;
-    width: calc(50% - 10px);
-    z-index: 3;
-  }
-  
-  input#expense  {
-    right: 0;
-  }
-  
-  .option {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 10px;
-    background: #eee;
-    border-radius: 5px;
-    position: relative;
-  }
-  
-  .option label {
-    width: 50%;
-    text-align: center;
-    cursor: pointer;
-    z-index: 2;
-  }
-  
-  .option::before {
+  /* .option::before {
     content: "";
     position: absolute;
     top: 5px;
@@ -139,9 +97,9 @@
     border-radius: inherit;
     box-shadow: 0 2px 2px rgba(0, 0, 0, 0.1);
     transition: all 200ms;
-  }
+  } */
   
-  input#type:checked ~ .option::before {
+  /* input#type:checked ~ .option::before {
     left: 50%;
   }
   
@@ -151,4 +109,4 @@
   
   input#expense:checked ~ .option::before {
     left: 50%;
-  }
+  } */

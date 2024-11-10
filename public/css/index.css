@@ -64,9 +64,9 @@
 
 }
 
-#dashboard_section .budget-summary{
+#dashboard_section .budget-summary,.recent-transactions{
     background-color: aqua;
-    width: fit-content;
+    width: 100%;
     /* margin-left: auto; */
     /* margin-right: auto; */
     padding: 10px;
@@ -182,11 +182,26 @@
       }
   }
 
-
+  @media (min-width: 769px) {
   .show {
     display: block!important;
   }
+  #overlay{
+    display: none!important;
+  }
+  .dashboard-container {
+    margin-top: 40px;
+  
+}
 
+.sidebar {
+  position: sticky;
+}
+body{
+  display: flex;
+  height: auto;
+}
+}
  
   
   .tab button {

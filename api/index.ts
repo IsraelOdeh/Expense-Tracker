@@ -55,7 +55,7 @@ const authenticateToken = (req, res, next) => {
         req.user = verified;  // req.user will now contain the user ID from the token
         next();
     } catch (error) {
-        res.status(403).sendFile(path.join(__dirname,'..','public','login.html'))
+        return res.sendFile(path.join(__dirname,'..','public','login.html'))
     };      
 };
 
@@ -185,6 +185,24 @@ app.post('/api/expenses', authenticateToken, async(req, res) => {
 
 });
 
+app.post('/api/editexpenses', authenticateToken, async(req, res) => {
+    const { type, amount, category, description, date ,id} = req.body;
+    if (!type || !amount || !category || !description || !date || !id) {
+        return res.status(400).json({ message: 'All fields are required.' });
+    }
+    // Define user id
+    const user_id = req.user.id
+    
+    try {
+		await sql`UPDATE Transaction SET amount = ${amount}, date = ${date}, description = ${description},type = ${type}, category =  ${category} WHERE trans_id = ${id};`;
+		res.status(201).json({});;
+	} catch (error) {
+		console.error(error);
+		res.status(500).send('Error adding transaction');
+	}
+
+});
+
 
 app.post('/api/budget', authenticateToken, async(req, res) => {
     const {name, budget, month, year } = req.body;
@@ -199,7 +217,10 @@ app.post('/api/budget', authenticateToken, async(req, res) => {
 		await sql`INSERT INTO Budgets (user_id,name, budget, month, year) VALUES (${user_id}, ${name}, ${budget}, ${month}, ${year});`;
 		res.status(201).json({});;
 	} catch (error) {
-		console.error(error);
+        if(error.code = 23505){
+            return res.status(400).json({ message: 'A budget for this month has already been made' });
+        }
+		console.error(error.code);
 		res.status(500).send('Error adding budget');
 	}
 
@@ -234,8 +255,6 @@ app.get('/budget', authenticateToken, async(req, res) => {
 		res.status(500).send('Error retrieving transactions');
 	}
 });
-
-
 
 // Start the server and listen on the specified port
 app.listen(process.env.PORT, () => console.log(`Server running`));

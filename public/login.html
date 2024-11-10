@@ -21,18 +21,32 @@
                     <span id="message"></span>
                 </div>
                 <!-- Login Form -->
-                <form id="login-form">
+                <form id="login-form" style="display: block; justify-items: center;">
                     <div id="loginmessage"></div>
-                    <label>Username</label>
-                    <input type="text" name="username" required />
-                    <label>Password</label>
-                    <input type="password" name="password" required />
+
+                    <div class="input">
+                        <div class="input-addon">
+                            <label>Username</label>
+                        </div>
+                        <input name="username" placeholder="Username" type="text" required autocomplete="off">
+                    </div>
+
+
+
+                    <div class="input">
+                        <div class="input-addon">
+                            <label>Password</label>
+                        </div>
+                        <input type="password" name="password" placeholder="Password" required autocomplete="off">
+                    </div>
+
+
                     <button type="submit">Login</button>
                     <p class="error-message" id="login-error"></p>
                 </form>
 
                 <!-- Register Form -->
-                <form id="register-form" style="display: none;">
+                <form id="register-form" style="display: none; justify-items: center;">
                     <div id="registermessage"></div>
 
 
@@ -40,7 +54,7 @@
 
                     <div class="input">
                         <div class="input-addon">
-                            <i class="material-icons">face</i>
+                            <label>First Name</label>
                         </div>
                         <input name="firstname" id="firstname" placeholder="Firstname" type="text" required
                             class="validate" autocomplete="off">
@@ -48,7 +62,7 @@
 
                     <div class="input">
                         <div class="input-addon">
-                            <i class="material-icons">face</i>
+                            <label>Last Name</label>
                         </div>
                         <input name="lastname" id="lastname" placeholder="Lastname" type="text" required
                             class="validate" autocomplete="off">
@@ -56,7 +70,7 @@
 
                     <div class="input">
                         <div class="input-addon">
-                            <i class="material-icons">face</i>
+                            <label>Username</label>
                         </div>
                         <input name="username" id="username" placeholder="Username" type="text" required
                             class="validate" autocomplete="off">
@@ -64,7 +78,7 @@
 
                     <div class="input">
                         <div class="input-addon">
-                            <i class="material-icons">email</i>
+                            <label>Email</label>
                         </div>
                         <input id="email" placeholder="Email" type="email" required class="validate" autocomplete="off">
                     </div>
@@ -72,15 +86,11 @@
 
                     <div class="input">
                         <div class="input-addon">
-                            <i class="material-icons">email</i>
+                            <label>Password</label>
                         </div>
                         <input id="password" placeholder="Password" type="password" required class="validate"
                             autocomplete="off">
                     </div>
-
-
-
-
 
 
 

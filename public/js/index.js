@@ -1,3 +1,20 @@
+// var chrt = document.getElementById("chartId").getContext("2d");
+//       var chartId = new Chart(chrt, {
+//          type: 'pie',
+//          data: {
+//             labels: ["HTML", "CSS", "JAVASCRIPT", "CHART.JS", "JQUERY", "BOOTSTRP"],
+//             datasets: [{
+//                label: "online tutorial subjects",
+//                data: [20, 40, 13, 35, 20, 38],
+//                backgroundColor: ['yellow', 'aqua', 'pink', 'lightgreen', 'gold', 'lightblue'],
+//                hoverOffset: 5
+//             }],
+//          },
+//          options: {
+//             responsive: false,
+//          },
+//       });
+
 
 // const token = localStorage.getItem('token');
 
@@ -66,15 +83,43 @@ async function fetchEntries() {
     displayEntries(entries);
   }
   
+  let transaction ;
   function displayEntries(entries) {
+    transaction = entries;
     const tableBody = document.getElementById('entries-table').querySelector('tbody');
     tableBody.innerHTML = '';
     let total = 0;
     let totincome = 0;
     let totexpense = 0;
+
+    index = 0;
+    recents = document.getElementById('recent-transactions');
+    recents.innerHTML = '';
     entries.forEach(entry => {
-        entry.date = new Date(Date.parse(entry.date))
-        entry.date = entry.date.getUTCFullYear() +  "/" + (entry.date.getUTCMonth() + 1) + "/" + entry.date.getUTCDate();
+      entry.date = new Date(Date.parse(entry.date))
+      entry.date = entry.date.getUTCFullYear() +  "-" + (entry.date.getUTCMonth() + 1) + "-" + entry.date.getUTCDate();
+
+      if(index < 3){
+        console.log(index)
+        recents.innerHTML +=`
+          <li style="display: flex;justify-content: space-between;">
+            <p> ${entry.description}</span> <p> ${(entry.type = 'expense'? '-':'+' )}${entry.amount}
+          </li>
+        `
+        index++;
+      }else if(index == 3){
+        
+        console.log(index)
+        recents.innerHTML +=`
+          <li>
+            <button>
+              More transactions...
+            </button>
+          </li>
+        `
+        index++;
+      }
+
 
       if(entry.type === 'income'){
         totincome += Number(entry.amount);
@@ -94,8 +139,8 @@ async function fetchEntries() {
         <td>${entry.type}</td>
 
         <td>
-          <button onclick="editEntry(${entry.id})">Edit</button>
-          <button onclick="deleteEntry(${entry.id})">Delete</button>
+          <button onclick="editEntry(${entry.trans_id})">Edit</button>
+          <button onclick="deleteEntry(${entry.trans_id})">Delete</button>
         </td>
       `;
       tableBody.appendChild(row);
@@ -107,6 +152,53 @@ async function fetchEntries() {
 
   }
   
+  
+  async function editEntry(id,entry){
+    let filteredValues = transaction.filter(item => item.trans_id === id)
+    console.log(filteredValues);
+    form = document.getElementById('edit-entry-form');
+    form.innerHTML = ''
+    form.innerHTML += `
+      <input type = "hidden" value=${filteredValues[0].trans_id} name="trans_id">
+      <input type="radio" name="type" class="type"  id="income" value="income" ${(filteredValues[0].type == "income" ? 'checked' : '')}  required />
+      <input type="radio" name="type" id="expense" class="type" value="expense"  ${(filteredValues[0].type == "expense" ? 'checked' : '')} required />
+      <div class="option">
+        <label for="income">Income</label>
+        <label for="expense">Expense</label>
+      </div>
+      <input type="text" name="description" placeholder="Description" value="${filteredValues[0].description}" required />
+      <input type="number" name="amount" placeholder="Amount"  value="${filteredValues[0].amount}"  required />
+
+      <select name="category" id="category">
+        <option ${ (filteredValues[0].category == "Housing" ? 'selected' : '') } value="Housing">Housing</option>
+        <option  ${ (filteredValues[0].category == "Transportation" ? 'selected' : '') } value="Transportation">Transportation</option>
+        <option  ${ (filteredValues[0].category  == "Food" ? 'selected' : '') } value="Food">Food</option>
+        <option  ${ (filteredValues[0].category == "Health & Medical" ? 'selected' : '') } value="Health & Medical">Health & Medical</option>
+        <option  ${ (filteredValues[0].category == "Entertainment & Leisure" ? 'selected' : '') } value="Entertainment & Leisure">Entertainment & Leisure</option>
+        <option  ${ (filteredValues[0].category == "Personal Care" ? 'selected' : '') } value="Personal Care">Personal Care</option>
+        <option  ${ (filteredValues[0].category == "Education" ? 'selected' : '') } value="Education">Education</option>
+        <option  ${ (filteredValues[0].category == "Savings & Investments" ? 'selected' : '') } value="Savings & Investments">Savings & Investments</option>
+        <option   ${ (filteredValues[0].category == "Miscellaneous" ? 'selected' : '') }value="Miscellaneous">Miscellaneous</option>
+      </select>
+
+      <input type="date" name="date"  value="${filteredValues[0].date}" required />
+
+      <button type="submit">Add</button>
+    `
+    // const token = localStorage.getItem('token');
+    // await fetch('/api/editexpenses', {
+    //   method: 'POST',
+    //   headers: {
+    //     'Authorization': `Bearer ${token}`,
+    //     'Content-Type': 'application/json'
+    //   },
+    //   body: JSON.stringify({ description, amount, date, type, category })
+    // });
+    // fetchEntries();
+  }
+
+
+
   async function addEntry(description, amount,category,date,type)  {
     const token = localStorage.getItem('token');
     await fetch('/api/expenses', {
@@ -120,15 +212,48 @@ async function fetchEntries() {
     fetchEntries();
   }
 
-  function displayBudget(entries) {
-    
-    
-    console.log(entries)
-    entries.budgetrow.forEach(entry => {
-        let Body = document.getElementById('budget_display');
-        // entry.created_at = new Date(Date.parse(entry.date))
-        // entry.created_at = entry.created_at.getUTCFullYear() +  "/" + (entry.created_at.getUTCMonth() + 1) + "/" + entry.date.getUTCDate();
+  
+  async function updateEntry(description, amount,category,date,type,id)  {
+    const token = localStorage.getItem('token');
+    await fetch('/api/editexpenses', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ description, amount, date, type, category,id })
+    });
+    fetchEntries();
+  }
 
+
+  function displayBudget(entries) {
+    this_year = new Date().getFullYear();
+    this_month = new Date().getMonth() +1;
+    console.log(this_year+':'+this_month)
+
+    month_array = {'1':'Jan', '2':'Feb', '3':'Mar', '4':'Apr', '5':'May', '6':'Jun', '7':'Jul','8': 'Aug', '9':'Sep', '10':'Oct', '11': 'Nov', '12':'Dec'} 
+    
+    this_month = String(this_month)
+    this_month = month_array[this_month]
+    let filteredValues = entries.budgetrow.filter(item => item.month === this_month && item.year === this_year)
+    array = {}
+    filteredValues[0].budget.split(',').forEach((pair) =>{
+      const [key,value] = pair.split(':')
+      array[key] = value;
+    });
+    totalBudget = 0;
+    Object.keys(array).forEach(element =>{
+        totalBudget += Number(array[element])
+    })
+    console.log(totalBudget)
+    console.log(entries)
+    
+    let Body = document.getElementById('budget_display');
+        Body.innerHTML = ""
+    entries.budgetrow.forEach(entry => {
+      Body = document.getElementById('budget_display');
+      budget_date =entry.month+', '+entry.year;
       //<div>
       //  <strong>${entry.name}</strong>: $$totalSpent.toFixed(2)} / $${entr.budget_amount.toFixed(2)}
       //    <div class="progress-bar">
@@ -137,10 +262,13 @@ async function fetchEntries() {
       //</div>
 
       Body.innerHTML += `
-        <div style="width: 80%;display: flex;align-items: center;justify-content: space-evenly; margin-left: auto;margin-right: auto;">
+        <div style="width: 60%;display: flex;align-items: center;justify-content: space-between; margin-left: auto;margin-right: auto;">
+          
           <span style="font-weight: 800;text-transform: capitalize;">${entry.name}</span>
-          <span>${entry.created_at}</span>
-          <button onclick="document.getElementById(${entry.budget_id}).classList.toggle('show')">View</button>
+          <div>
+            <span style="margin-right: 40px;">${budget_date}</span>
+            <button onclick="document.getElementById(${entry.budget_id}).classList.toggle('show')">View</button>
+          </div>
         </div>
         <div style="display: none; width: fit-content;margin-left: auto;margin-right: auto; border: solid;padding: 5px;border-width: thin;" id="${entry.budget_id}">
         </div>
@@ -229,6 +357,17 @@ async function fetchEntries() {
     addEntry(description, amount, category, date,type);
   });
   
+  document.getElementById('edit-entry-form').addEventListener('submit', (event) =>{
+    event.preventDefault();
+    const id = event.target.trans_id.value;
+    const description = event.target.description.value;
+    const amount = event.target.amount.value;
+    const category = event.target.category.value;
+    const date = event.target.date.value;
+    const type = event.target.type.value;
+    updateEntry(description, amount, category, date,type,id);
+  })
+
 checkboxes = document.getElementById('budget_section').querySelectorAll('input[type=checkbox]');
 
 document.getElementById('budgetForm').addEventListener('submit', (event) => {
@@ -282,6 +421,7 @@ checkboxes.forEach(element => {
 
   document.getElementById('logout').addEventListener('click', () => {
     localStorage.removeItem('token');
+    toggleSidebar()
     window.location = "/loginpage";
   });
 
@@ -290,18 +430,21 @@ checkboxes.forEach(element => {
     document.getElementById('add_transaction_section').classList.remove('show');
     document.getElementById('view_transaction_section').classList.remove('show');
     document.getElementById('budget_section').classList.remove('show');
+    toggleSidebar()
   });
   document.getElementById('add_transaction').addEventListener('click', () => {
     document.getElementById('add_transaction_section').classList.add('show');
     document.getElementById('dashboard_section').classList.remove('show');
     document.getElementById('view_transaction_section').classList.remove('show');
     document.getElementById('budget_section').classList.remove('show');
+    toggleSidebar()
   });
   document.getElementById('view_transaction').addEventListener('click', () => {
     document.getElementById('view_transaction_section').classList.add('show');
     document.getElementById('dashboard_section').classList.remove('show');
     document.getElementById('add_transaction_section').classList.remove('show');
     document.getElementById('budget_section').classList.remove('show');
+    toggleSidebar()
   });
 
   document.getElementById('budget').addEventListener('click', () => {
@@ -309,4 +452,5 @@ checkboxes.forEach(element => {
     document.getElementById('view_transaction_section').classList.remove('show');
     document.getElementById('dashboard_section').classList.remove('show');
     document.getElementById('add_transaction_section').classList.remove('show');
+    toggleSidebar()
   });

@@ -58,27 +58,28 @@
                         <p>Food Budget: $200 used of $300</p>
                         <!-- More budget categories... -->
                     </div>
-
-                    <!-- Charts Section -->
-                    <div class="charts">
-                        <div class="pie-chart"> <!-- Pie Chart for Expense Categories --> </div>
+                    <!-- Recent Transactions -->
+                    <div class="recent-transactions">
+                        <h3>Recent Transactions</h3>
+                        <ul id="recent-transactions">
+                            <li>Groceries - $50 - Expense</li>
+                            <li>Freelance - $200 - Income</li>
+                            <li>Utility Bill - $100 - Expense</li>
+                            <li>
+                                <button>
+                                    More transactions...
+                                </button>
+                            </li>
+                        </ul>
                     </div>
 
+
                 </div>
-                <!-- Recent Transactions -->
-                <div class="recent-transactions">
-                    <h3>Recent Transactions</h3>
-                    <ul>
-                        <li>Groceries - $50 - Expense</li>
-                        <li>Freelance - $200 - Income</li>
-                        <li>Utility Bill - $100 - Expense</li>
-                        <li>
-                            <button>
-                                More transactions...
-                            </button>
-                        </li>
-                    </ul>
+                <!-- Charts Section -->
+                <div class="charts">
+                    <!-- <canvas id="chartId" aria-label="chart" height="350" width="580"></canvas> -->
                 </div>
+
             </section>
             <section id="add_transaction_section" style="display: none;">
                 <!-- Add New Expense/Income -->
@@ -131,6 +132,10 @@
                         <div id="status" style="text-align: center;"></div>
                     </tbody>
                 </table>
+                <div class="overlay"></div>
+                <form id="edit-entry-form">
+
+                </form>
             </section>
 
             <section id="budget_section" style="display: none;">
@@ -140,7 +145,6 @@
                     Budget Plans Are Shown Here
                 </span>
                 <div id="budget_display">
-
                 </div>
 
                 <button onclick="document.getElementById('budget-form').classList.toggle('show')">Add New
@@ -265,7 +269,7 @@
                 </div>
             </section>
         </main>
-
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.1.1/chart.min.js"></script>
         <script src="js/index.js"></script>
     </body>
 
