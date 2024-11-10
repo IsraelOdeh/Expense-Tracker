@@ -310,25 +310,20 @@ async function fetchEntries() {
       entry.budget = budgetString2array(entry.budget);
       Body = document.getElementById(entry.budget_id);
       Body.innerHTML = ''
-      console.log(entry.budget);
+      console.log(entry);
       Object.keys(entry.budget).forEach(key =>{
 
         totalSpent = 0;
-        entries.expenserow.forEach(expense =>{
+        // entries.expenserow.forEach(expense =>{
+        //   expense.date = new Date(Date.parse(expense.date));
+        //   year = expense.date.getUTCFullYear() 
+        //   month = getMonthinWords(expense.date.getUTCMonth() + 1)
+        //   // entry.date = entry.date.getUTCFullYear() +  "/" + (entry.date.getUTCMonth() + 1) + "/" + entry.date.getUTCDate();
+        //   if(expense.category == key && month == entry.month && year == entry.year){
+        //     totalSpent += Number(expense.amount);
+        //   }
+        // })
 
-          expense.date = new Date(Date.parse(expense.date));
-          
-          year = expense.date.getUTCFullYear() 
-          
-          month = expense.date.getUTCMonth() + 1;
-          month = getMonthinWords(month)
-          // entry.date = entry.date.getUTCFullYear() +  "/" + (entry.date.getUTCMonth() + 1) + "/" + entry.date.getUTCDate();
-
-          if(expense.category == key && month == entry.month && year == entry.year){
-            totalSpent += Number(expense.amount);
-          }
-        })
-        // console.log(key +''+ totalSpent)
         if(entry.budget[key] > 0){
           Body.innerHTML +=`
             <div> 
