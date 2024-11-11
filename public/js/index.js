@@ -388,7 +388,7 @@ async function fetchEntries() {
     updateEntry(description, amount, category, date,type,id);
   })
 
-checkboxes = document.getElementById('budget_section').querySelectorAll('input[type=checkbox]');
+checkboxes = document.getElementById('budget_form').querySelectorAll('input[type=checkbox]');
 
 document.getElementById('budgetForm').addEventListener('submit', (event) => {
   event.preventDefault();
