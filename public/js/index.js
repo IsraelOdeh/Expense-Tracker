@@ -69,6 +69,13 @@ document.getElementById("sidebar_toggle").addEventListener("click", toggleSideba
 // Close sidebar when clicking outside on the overlay
 overlay.addEventListener("click", toggleSidebar);
 
+
+window.addEventListener('offline', () => {
+  // alert('You are offline. Some features may be unavailable.');
+  document.getElementById('offline').classList.add('show')
+
+});
+
 //Check if user is previously logged in after reload
 window.addEventListener("load", (event) => {
     const token = localStorage.getItem('token');
@@ -88,8 +95,12 @@ window.addEventListener("load", (event) => {
         .then(data => {
             if (data.id) {
                 // Fetch expenses
-                fetchEntries();
-                fetchBudget();
+                try {
+                  fetchEntries()
+                  fetchBudget();
+                } catch (error) {
+                  console.log('errrrrrrrrrrrrrrrrrrrrrrrrrrr')
+                }
             } else {
                 // Handle login error
                 window.location = "/loginpage";
@@ -100,25 +111,50 @@ window.addEventListener("load", (event) => {
         });
 });
 
-async function fetchEntries() {
+function S_Error(error) {
+  console.log("beep  beep beep beep beep")
+  return
+}
+
+async function fetchEntries(retries = 3) {
     const token = localStorage.getItem('token');
-    const response = await fetch('/expenses', {
-        method: 'GET',
-      headers: { Authorization: `Bearer ${token}` }
-    });
-    const entries = await response.json();
-    if(entries.message){
-        document.getElementById('status').textContent = entries.message;
-        document.getElementById('status').style.color = 'red';
-        return;
-     }
-     else{
-        document.getElementById('status').textContent = '';
-     }
-    displayEntries(entries);
+    for (let i = 0; i < retries; i++) {
+      try {
+        const response = await fetch('/expenses', {
+          method: 'GET',
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        
+        if (response.ok){
+          const entries = await response.json();
+          transaction = entries;
+
+          displayEntries(entries);
+          document.getElementById('refresh_dialog').setAttribute('style','display:none;')
+
+          return
+        }
+          else {
+            throw new Error}
+      } catch (error) {
+        console.log(error);
+
+        console.log('Retrieve attempt '+ (i + 1)+' failed. Retrying...');
+        await new Promise(resolve => setTimeout(resolve, 2 ** i * 1000)); // Exponential backoff
+      }
+    }
+    console.error('Unable to fetch data after multiple attempts.');
+
+
+        // const entries = await response.json();
+        // console.log(entries)
+    
+    //  transaction = entries;
+    // displayEntries(entries);
   }
   
   function displayEntries(entries) {
+
     transaction = entries;
     const tableBody = document.getElementById('entries_table').querySelector('tbody');
     tableBody.innerHTML = '';
@@ -126,15 +162,29 @@ async function fetchEntries() {
     let total_income = 0;
     let total_expense = 0;
 
+    if(entries.message){
+      document.getElementById('status').textContent = entries.message;
+      document.getElementById('status').style.color = 'red';
+
+      document.getElementById('recent_transactions').textContent = 'No tranaction entered';
+      
+      document.getElementById('total').textContent = `$${total}`;
+      document.getElementById('total_income').textContent = `$${total_income}`;
+      document.getElementById('total_expense').textContent = `$${total_expense}`;
+      return;
+    }else{
+      document.getElementById('status').textContent = '';
+    }
+
     index = 0;
     recents = document.getElementById('recent_transactions');
     recents.innerHTML = '';
     entries.forEach(entry => {
-      entry.date = new Date(Date.parse(entry.date))
-      entry.date = entry.date.getUTCFullYear() +  "-" + (entry.date.getUTCMonth() + 1) + "-" + entry.date.getUTCDate();
+      date = new Date(entry.date);
+      month = getMonthinWords(date.getUTCMonth() + 1)
+      date = (date.getUTCDate()+1) +  " " + (month) + ", " +date.getUTCFullYear();
 
       if(index < 3){
-        console.log(index)
         recents.innerHTML +=`
           <li style="display: flex;justify-content: space-between;">
             <p> ${entry.description}</span> <p> ${(entry.type == 'expense'? '-':'+' )}${entry.amount}
@@ -142,19 +192,16 @@ async function fetchEntries() {
         `
         index++;
       }else if(index == 3){
-        
-        console.log(index)
         recents.innerHTML +=`
           <li>
     
-            <button onclick="navMenu('view_transaction');toggleSidebar()">
+            <button onclick="navMenu('view_transaction');toggleSidebar()" style="width: 100%;">
               More transactions...
             </button>
           </li>
         `
         index++;
       }
-
 
       if(entry.type === 'income'){
         total_income += Number(entry.amount);
@@ -170,11 +217,11 @@ async function fetchEntries() {
         <td>${entry.description}</td>
         <td>$${entry.amount}</td>
         <td>${entry.category}</td>
-        <td>${entry.date}</td>
+        <td>${date}</td>
         <td>${entry.type}</td>
 
         <td>
-          <button onclick="editEntry(${entry.trans_id},)">Edit</button>
+          <button onclick="editEntry(${entry.trans_id})">Edit</button>
           <button onclick="deleteEntry(${entry.trans_id})">Delete</button>
         </td>
       `;
@@ -184,12 +231,18 @@ async function fetchEntries() {
     document.getElementById('total_income').textContent = `$${total_income}`;
     document.getElementById('total_expense').textContent = `$${total_expense}`;
 
-
   }
 
-  async function editEntry(id,entry){
+  async function editEntry(id){
+    document.getElementById('entry_overlay').classList.add('show')
+    document.getElementById('edit_entry').classList.add('show');
     let filteredValues = transaction.filter(item => item.trans_id === id)
+
     console.log(filteredValues);
+      
+    date = new Date(filteredValues[0].date);
+    date = date.getUTCFullYear() +  "-" + `${( (date.getUTCMonth() + 1) <10 ? String(date.getUTCMonth() + 1).padStart(2, '0') : (date.getUTCMonth() + 1) )}` + "-" + `${( (date.getUTCDate()) <10 ? String(date.getUTCDate()).padStart(2, '0') : (date.getUTCDate() +1) )}`
+
     form = document.getElementById('edit_entry_form');
     form.innerHTML = ''
     form.innerHTML += `
@@ -215,10 +268,22 @@ async function fetchEntries() {
         <option   ${ (filteredValues[0].category == "Miscellaneous" ? 'selected' : '') }value="Miscellaneous">Miscellaneous</option>
       </select>
 
-      <input type="date" name="date"  value="${filteredValues[0].date}" required />
+      <input type="date" name="date"  value="${date}" required />
 
-      <button type="submit">Add</button>
+      <button type="submit" name="submit" >Add</button>
     `
+  }
+
+  async function deleteEntry(id){
+    document.getElementById("delete_overlay").classList.add('show');
+    document.getElementById("delete_entry").classList.add('show');
+
+    document.getElementById("delete_id").value = id;
+
+    // console.log(filteredValues);
+    const token = localStorage.getItem('token');
+
+   
   }
 
   async function addEntry(description, amount,category,date,type)  {
@@ -234,9 +299,10 @@ async function fetchEntries() {
     fetchEntries();
   }
 
-  async function updateEntry(description, amount,category,date,type,id)  {
+  function updateEntry(description, amount,category,date,type,id)  {
+    console.log(date)
     const token = localStorage.getItem('token');
-    await fetch('/api/editexpenses', {
+    fetch('/api/editexpenses', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -244,7 +310,9 @@ async function fetchEntries() {
       },
       body: JSON.stringify({ description, amount, date, type, category,id })
     });
-    fetchEntries();
+
+    document.getElementById('refresh_dialog').setAttribute('style','display:flex;flex-direction: column;')
+
   }
 
   function getMonthinWords(nummonth) {
@@ -266,6 +334,9 @@ async function fetchEntries() {
   }
 
   function getCurrentBudget(row){
+    this_year = new Date().getFullYear();
+    this_month = getMonthinWords(new Date().getMonth() +1)
+
     let filteredValues = row.filter(item => item.month === this_month && item.year === this_year)
     budgetArray = budgetString2array(filteredValues[0].budget)
     totalBudget = 0;
@@ -273,17 +344,19 @@ async function fetchEntries() {
         totalBudget += Number(budgetArray[element])
     })
     console.log(totalBudget)
-    console.log(row)
+    console.log(filteredValues)
+    summary = document.getElementById('budget_summary');
+
     return ;
   }
-  function displayBudget(entries) {
-    this_year = new Date().getFullYear();
-    this_month = getMonthinWords(new Date().getMonth() +1)
 
+  function displayBudget(entries) {
+    console.log(entries)
     getCurrentBudget(entries.budgetrow);
     
     let Body = document.getElementById('budget_display');
-        Body.innerHTML = ""
+    
+    Body.innerHTML = ""
     entries.budgetrow.forEach(entry => {
       Body = document.getElementById('budget_display');
       budget_date =entry.month+', '+entry.year;
@@ -309,13 +382,13 @@ async function fetchEntries() {
 
       entry.budget = budgetString2array(entry.budget);
       Body = document.getElementById(entry.budget_id);
-      Body.innerHTML = ''
+      Body.innerHTML = '';
       console.log(entry);
       Object.keys(entry.budget).forEach(key =>{
 
         totalSpent = 0;
         // entries.expenserow.forEach(expense =>{
-        //   expense.date = new Date(Date.parse(expense.date));
+        //   expense.date = new Date(expense.date);
         //   year = expense.date.getUTCFullYear() 
         //   month = getMonthinWords(expense.date.getUTCMonth() + 1)
         //   // entry.date = entry.date.getUTCFullYear() +  "/" + (entry.date.getUTCMonth() + 1) + "/" + entry.date.getUTCDate();
@@ -339,13 +412,19 @@ async function fetchEntries() {
   async function fetchBudget() {
     const token = localStorage.getItem('token');
     const response = await fetch('/budget', {
-        method: 'GET',
+      method: 'GET',
       headers: { Authorization: `Bearer ${token}` }
     });
     const entries = await response.json();
     if(entries.message){
         // document.getElementById('status').textContent = entries.message;
         // document.getElementById('status').style.color = 'red';
+        console.log('entrieeeeeeeeee')
+        document.getElementById('budget_display').innerHTML = `
+          <span style="margin-left: auto;margin-right: auto;display: block;width: fit-content;">
+            You Have No Budget Planned Yet
+          </span>
+        ` ;
         return;
      }
      else{
@@ -356,7 +435,7 @@ async function fetchEntries() {
 
   async function addBudget(name,budget,month,year){
     const token = localStorage.getItem('token');
-    await fetch('/api/budget', {
+    const response =  await fetch('/api/budget', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -364,7 +443,21 @@ async function fetchEntries() {
       },
       body: JSON.stringify({name,budget,month,year })
     });
-    fetchBudget();
+    const entries = await response.json();
+    if (entries.message) {
+      document.getElementById('budgetMessage').textContent = entries.message;
+      return;
+    }
+
+    document.getElementById('budgetloader').classList.remove('show');
+ 
+    document.getElementById('budget_form').classList.remove('show'); 
+    document.getElementById('budget_label').classList.add('show'); 
+    document.getElementById('budget_display').classList.add('show');
+
+    document.getElementById('refresh_budget').classList.add('show');
+
+    // fetchBudget();
   }
 
   document.getElementById('entry_form').addEventListener('submit', (event) => {
@@ -385,7 +478,17 @@ async function fetchEntries() {
     const category = event.target.category.value;
     const date = event.target.date.value;
     const type = event.target.type.value;
+    
+    // document.getElementById('edit_entry_loader').classList.add('show');
+    event.target.submit.disabled = true;
     updateEntry(description, amount, category, date,type,id);
+
+    document.getElementById('edit_entry_form').innerHTML = '';
+    document.getElementById('entry_overlay').classList.remove('show');
+    document.getElementById('edit_entry').classList.remove('show')
+    // document.getElementById('edit_entry_loader').classList.remove('show')
+    event.target.submit.disabled = false;
+
   })
 
 checkboxes = document.getElementById('budget_form').querySelectorAll('input[type=checkbox]');
@@ -408,7 +511,6 @@ document.getElementById('budgetForm').addEventListener('submit', (event) => {
     const name = event.target.Name.value
 
     inputboxes.forEach(input =>{
-      console.log(input)
       input.classList.remove('show');
       child = input.children;
       i = 0;
@@ -418,15 +520,16 @@ document.getElementById('budgetForm').addEventListener('submit', (event) => {
       }
     })
     
-    event.target.reset()
-    document.getElementById('budget_form').classList.toggle('show'); 
-    document.getElementById('budget_overlay').classList.toggle('show')
+    document.getElementById('budgetloader').classList.add('show');
 
-    // addBudget(name,budget,month,year);
+
+    addBudget(name,budget,month,year);
   }
   else{
     document.getElementById("budgetMessage").textContent = "Select at least 1 category to budget"
   }
+
+
 });
 
 inputboxes = document.getElementById('budget_section').querySelectorAll('div[class=categoryAmount]');
@@ -459,3 +562,24 @@ checkboxes.forEach(element => {
     toggleSidebar()
     window.location = "/loginpage";
   });
+
+  document.getElementById('delete_confirm').addEventListener('click',(event) =>{
+    event.preventDefault()
+    const token = localStorage.getItem('token');
+    const id = document.getElementById('delete_id').value;
+    console.log(id)
+
+     fetch('/api/deleteexpense', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({id})
+    });
+
+    document.getElementById('refresh_dialog').setAttribute('style','display:flex;flex-direction: column;')
+
+    document.getElementById('delete_overlay').classList.remove('show');
+    document.getElementById('delete_entry').classList.remove('show');
+  })

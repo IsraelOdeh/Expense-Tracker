@@ -12,6 +12,10 @@ document.getElementById('login-tab').addEventListener('click', () => {
     document.getElementById('register-tab').classList.add('active');
   });
   
+  // window.addEventListener('offline', () => {
+  //   console.log("yghjikolp;")
+  //   alert('You are offline. Some features may be unavailable.');
+  // });
 
 async  function login(username,password) {
     try {   
@@ -21,17 +25,14 @@ async  function login(username,password) {
           body: JSON.stringify({ username, password })
         });
         const data = await response.json();
-        console.log("data")
         if (data.token) {
-          console.log(data)
           localStorage.setItem('token', data.token);
           window.location.href = 'index.html';
         } else {
-          document.getElementById('login-error').innerText = 'Invalid credentials';
+          document.getElementById('login-error').innerText = 'Error Connecting to servers. Try again';
         }
       } catch (error) {
-          document.getElementById('login-error').innerText = 'Invalid credentials';
-          console.error('Login failed', error);
+          document.getElementById('login-error').innerText = 'Error Connecting to servers. Try again';
       }
   }
 

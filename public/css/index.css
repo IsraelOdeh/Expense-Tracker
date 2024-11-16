@@ -17,7 +17,7 @@
 
   .container, .dashboard_container {
     width: 100%;
-    max-width: 510px;
+    max-width: 700px;
     background-color: #fff;
     /* padding: 20px; */
     border-radius: 8px;
@@ -25,6 +25,7 @@
     margin-left: auto;
     margin-right: auto;
     margin-top: 70px;
+    padding: 25px;
   }
   
   .tab{
@@ -41,7 +42,7 @@
     flex-direction: column;
     gap: 10px;
     width: 80%;
-    margin-left: auto;
+    margin-left:auto;
     margin-right: auto;
   }
 
@@ -69,6 +70,10 @@
     font-size: 20px;
     font-weight: 800;
 
+}
+
+p {
+  margin: 0;
 }
 
 #dashboard_section .budget_summary,.recent_transactions{
@@ -148,7 +153,7 @@
     background-color: rgba(0, 0, 0, 0.5);
     z-index: 1;
     opacity: 0;
-    transition: opacity 1s ease-in-out;
+    transition: opacity 0.9s ease-in-out;
     pointer-events: none;
   }
   
@@ -180,12 +185,11 @@
     .sidebar {
       width: fit-content;
       height: auto;
-      display: none;
       position: fixed;
       z-index: 4;
       opacity: 0;
       pointer-events: none;
-      transition: opacity 1s ease-in-out;
+      transition: opacity 0.5s ease-in-out;
     }
   
     .content {
@@ -203,7 +207,6 @@
       }
     
       .sidebar.show {
-        display: block;
         opacity: 1;
         pointer-events: auto;
       }
@@ -221,7 +224,7 @@
     display: none!important;
   }
   .dashboard_container {
-    margin-top: 40px;
+    margin-top: 70px;
   
 }
 
@@ -290,6 +293,63 @@ body{
     text-align: center;
   }
   
+  #edit_entry {
+    display: flex !important;
+    position: fixed;
+    top: 28%;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.9s ease-in-out;
+    background: #333;
+    border-radius: 15px;
+    width: 100%;
+    right: 20%;
+    max-width: 325px;
+}
+
+
+form#edit_entry_form {
+  display: flex !important;
+margin-top: 30px;
+margin-bottom: 30px;
+}
+
+#edit_entry.show {
+  z-index: 6;
+  pointer-events: auto;
+  opacity: 1;
+}
+
+#delete_entry {
+  display: flex !important;
+  position: fixed;
+  top: 28%;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.9s ease-in-out;
+  background: #333;
+  border-radius: 15px;
+  width: 100%;
+  right: 20%;
+  max-width: 325px;
+  z-index: 4;
+  padding: 30px 0px;
+}
+
+#delete_overlay.show {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+div#delete_entry.show {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+div#entry_overlay.show {
+  opacity: 1;
+  pointer-events: auto;
+}
 
   input#expense, input#income  {
     appearance: none;
@@ -345,3 +405,87 @@ body{
   input#expense:checked ~ .option::before {
     left: 50%;
   }
+
+
+.loader {
+  width: 50px;
+  aspect-ratio: 4;
+  --_g: no-repeat radial-gradient(circle closest-side,#000 90%,#0000);
+  background: 
+    var(--_g) 0%   50%,
+    var(--_g) 50%  50%,
+    var(--_g) 100% 50%;
+  background-size: calc(100%/3) 100%;
+  animation: l7 1s infinite linear;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+@keyframes l7 {
+    33%{background-size:calc(100%/3) 0%  ,calc(100%/3) 100%,calc(100%/3) 100%}
+    50%{background-size:calc(100%/3) 100%,calc(100%/3) 0%  ,calc(100%/3) 100%}
+    66%{background-size:calc(100%/3) 100%,calc(100%/3) 100%,calc(100%/3) 0%  }
+}
+
+
+#edit_entry_loader{
+  margin-left: auto;
+  margin-right: auto;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  display: none;
+  justify-items: center;
+  align-content: center;
+}
+
+.formloader {
+  width: 55%;
+  aspect-ratio: 1;
+  /* display: grid; */
+  border-radius: 50%;
+  background:
+    linear-gradient(0deg ,rgb(0 0 0/50%) 30%,#0000 0 70%,rgb(0 0 0/100%) 0) 50%/8% 100%,
+    linear-gradient(90deg,rgb(0 0 0/25%) 30%,#0000 0 70%,rgb(0 0 0/75% ) 0) 50%/100% 8%;
+  background-repeat: no-repeat;
+  animation: l23 1s infinite steps(12);
+}
+.formloader::before,
+.formloader::after {
+   content: "";
+   grid-area: 1/1;
+   border-radius: 50%;
+   background: inherit;
+   opacity: 0.915;
+   transform: rotate(30deg);
+}
+.formloader::after {
+   opacity: 0.83;
+   transform: rotate(60deg);
+}
+@keyframes l23 {
+  100% {transform: rotate(1turn)}
+}
+
+#budgetloader.show {
+ opacity: 1; 
+ pointer-events: auto;
+}
+
+
+.budgetloader {
+  width: 79%;
+  margin-left: auto;
+  margin-right: auto;
+  opacity: 0;
+  height: 8px;
+  --c:no-repeat linear-gradient(#240a49 0 0);
+  background: var(--c),var(--c),#d7b8fc;
+  background-size: 60% 100%;
+  animation: l16 3s infinite;
+}
+@keyframes l16 {
+  0%   {background-position:-150% 0,-150% 0}
+  66%  {background-position: 250% 0,-150% 0}
+  100% {background-position: 250% 0, 250% 0}
+}

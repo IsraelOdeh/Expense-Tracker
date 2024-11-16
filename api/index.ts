@@ -91,7 +91,7 @@ app.post('/auth/login',urlencodedParser, async(req, res) => {
 		    }
 	} catch (error) {
 		console.error(error);
-		res.status(500).send('Error retrieving users');
+		res.json({error:'Error Connecting to servers. Try again'});
 	}
        
 });
@@ -149,6 +149,7 @@ app.post('/auth/register',urlencodedParser, async(req, res) => {
 
 });
 
+
 // GET /expenses - Retrieve all expenses for the authenticated user
 app.get('/expenses', authenticateToken, async(req, res) => {
     const userId = req.user.id;
@@ -156,13 +157,14 @@ app.get('/expenses', authenticateToken, async(req, res) => {
     try {
 		const users = await sql`SELECT * FROM Transaction WHERE user_id  = ${userId} ORDER BY date DESC;`;
 		if (users && users.rows.length > 0) {
+            console.log(users.rows)
             res.json(users.rows);
 		} else {
             return res.json({ message: 'User has no Transactions'});
 		}
 	} catch (error) {
 		console.error(error);
-		res.status(500).send('Error retrieving transactions');
+		res. status(500).json({ error: 'Error retrieving transactions' });
 	}
 });
 
@@ -185,8 +187,24 @@ app.post('/api/expenses', authenticateToken, async(req, res) => {
 
 });
 
+app.post('/api/deleteexpense', authenticateToken, async(req, res) => {
+    const { id } = req.body;
+    if (!id) {
+        return res.status(400).json({ message: 'Error' });
+    }
+    try {
+		await sql`DELETE FROM transaction WHERE trans_id = ${id};`;
+		res.status(201).json({});;
+	} catch (error) {
+		console.error(error);
+		res.status(500).send('Error adding transaction');
+	}
+
+});
+
 app.post('/api/editexpenses', authenticateToken, async(req, res) => {
     const { type, amount, category, description, date ,id} = req.body;
+    console.log(date)
     if (!type || !amount || !category || !description || !date || !id) {
         return res.status(400).json({ message: 'All fields are required.' });
     }
@@ -206,7 +224,7 @@ app.post('/api/editexpenses', authenticateToken, async(req, res) => {
 
 app.post('/api/budget', authenticateToken, async(req, res) => {
     const {name, budget, month, year } = req.body;
-    console.log(req.body)
+    // console.log(req.body)
     if (!name || !budget || !month || !year) {
         return res.status(400).json({ message: 'All fields are required.' });
     }
@@ -221,7 +239,7 @@ app.post('/api/budget', authenticateToken, async(req, res) => {
             return res.status(400).json({ message: 'A budget for this month has already been made' });
         }
 		console.error(error.code);
-		res.status(500).send('Error adding budget');
+		res.status(500).json({message: 'Error adding budget, Try Again'});
 	}
 
 });
@@ -233,7 +251,7 @@ app.get('/budget', authenticateToken, async(req, res) => {
     try {
 		const budget = await sql`SELECT * FROM budgets WHERE user_id  = ${userId} ORDER BY created_at DESC;`;
 		if (budget && budget.rows.length > 0) {
-            console.log(budget.rows)
+            // console.log(budget.rows)
             let budgetrow = budget.rows;
             let expenserow = null;
             try {
