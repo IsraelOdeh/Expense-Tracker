@@ -10,7 +10,7 @@
 
     </head>
 
-    <body style=="min-width: 300px;">
+    <body style="min-width: 300px;">
 
         <!-- Sidebar container -->
         <div class="sidebar" id="sidebar">
@@ -23,8 +23,13 @@
             <button id='logout'>Logout</button>
         </div>
 
-        <div id="offline" style="position: absolute;z-index: 9;right: 0;background-color: brown;height: 60px;">
-            You are offline, Check your internet and refresh this page
+        <div id="offline"
+            style="position: absolute;z-index: 9;right: 0;background-color: brown;height: 60px; top:0; max-width:258px;display:none;">
+            You are offline.
+            <br>
+            Check your internet
+            <br>
+            And refresh this page
         </div>
 
         <!-- Overlay for mobile dropdown -->

@@ -76,6 +76,12 @@ window.addEventListener('offline', () => {
 
 });
 
+window.addEventListener('online', () => {
+  // alert('You are online. Some features may be unavailable.');
+  document.getElementById('offline').classList.remove('show')
+
+});
+
 //Check if user is previously logged in after reload
 window.addEventListener("load", (event) => {
     const token = localStorage.getItem('token');
