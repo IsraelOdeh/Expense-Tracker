@@ -14,7 +14,6 @@
 
         <!-- Sidebar container -->
         <div class="sidebar" id="sidebar">
-            <h2>Menu</h2>
             <button onclick="navMenu('dashboard')">Dashboard</button>
             <button onclick="navMenu('add_transaction')">Add Expense</button>
             <button onclick="navMenu('view_transaction')">View Expenses</button>
@@ -54,13 +53,13 @@
 
                     <div style="display: flex; place-content: center; gap: 20%;">
                         <div>
-                            <span id="total_income" style="color: rgb(37, 66, 8);">
+                            <span id="total_income" style="color: rgb(47 243 5);">
                                 <div class="loader"></div>
                             </span>
                             <label>Income</label>
                         </div>
                         <div>
-                            <span id="total_expense" style="color:rgb(112, 14, 14); ">
+                            <span id="total_expense" style="color: rgb(196 0 0); ">
                                 <div class="loader"></div>
                             </span>
                             <label>Expense</label>
@@ -95,6 +94,7 @@
             <section id="add_transaction_section" style="display: none;">
                 <!-- Add New Expense/Income -->
                 <h3>Add New Entry</h3>
+                <span id="add_trans_message"></span>
                 <form id="entry_form">
                     <input type="radio" name="type" class="type" id="income" value="income" checked required />
                     <input type="radio" name="type" id="expense" class="type" value="expense" required />
@@ -180,8 +180,12 @@
 
             <section id="budget_section" style="display: none;">
                 <div style="display: none;" id="refresh_budget">Entries modified
-                    <button onclick="fetchBudget()"> click to refresh </button>
+                    <button onclick="fetchBudget();
+                    document.getElementById('refresh_budget').classList.add('show');">
+                        click to refresh
+                    </button>
                 </div>
+
                 <span id="budget_label"
                     style="margin-left: auto;margin-right: auto;display: block;width: fit-content;font-size: 17px;font-weight: 700;padding-top: 15px;padding-bottom: 20px;display: none;"
                     class="show">

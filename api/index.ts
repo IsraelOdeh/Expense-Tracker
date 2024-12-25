@@ -249,7 +249,7 @@ app.get('/budget', authenticateToken, async(req, res) => {
     const userId = req.user.id;
 
     try {
-		const budget = await sql`SELECT * FROM budgets WHERE user_id  = ${userId} ORDER BY created_at DESC;`;
+		const budget = await sql`SELECT * FROM budgets WHERE user_id  = ${userId} ORDER BY year DESC, month ASC;`;
 		if (budget && budget.rows.length > 0) {
             // console.log(budget.rows)
             let budgetrow = budget.rows;

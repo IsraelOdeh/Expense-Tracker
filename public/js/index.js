@@ -133,15 +133,20 @@ async function fetchEntries(retries = 3) {
         
         if (response.ok){
           const entries = await response.json();
-          transaction = entries;
+          if(entries.message){
+             transaction = null;
+          }else{
+            transaction = entries;
+          }
+
 
           displayEntries(entries);
           document.getElementById('refresh_dialog').setAttribute('style','display:none;')
 
           return
+        }else {
+          throw new Error
         }
-          else {
-            throw new Error}
       } catch (error) {
         console.log(error);
 
@@ -161,7 +166,6 @@ async function fetchEntries(retries = 3) {
   
   function displayEntries(entries) {
 
-    transaction = entries;
     const tableBody = document.getElementById('entries_table').querySelector('tbody');
     tableBody.innerHTML = '';
     let total = 0;
@@ -197,18 +201,7 @@ async function fetchEntries(retries = 3) {
           </li>
         `
         index++;
-      }else if(index == 3){
-        recents.innerHTML +=`
-          <li>
-    
-            <button onclick="navMenu('view_transaction');toggleSidebar()" style="width: 100%;">
-              More transactions...
-            </button>
-          </li>
-        `
-        index++;
       }
-
       if(entry.type === 'income'){
         total_income += Number(entry.amount);
         total += Number(entry.amount)
@@ -233,6 +226,14 @@ async function fetchEntries(retries = 3) {
       `;
       tableBody.appendChild(row);
     });
+    recents.innerHTML +=`
+    <li>
+
+      <button onclick="navMenu('view_transaction');toggleSidebar()" style="width: 100%;">
+        More transactions...
+      </button>
+    </li>
+  `
     document.getElementById('total').textContent = `$${total}`;
     document.getElementById('total_income').textContent = `$${total_income}`;
     document.getElementById('total_expense').textContent = `$${total_expense}`;
@@ -302,6 +303,8 @@ async function fetchEntries(retries = 3) {
       },
       body: JSON.stringify({ description, amount, date, type, category })
     });
+    document.getElementById("add_trans_message").innerText = 'Added Successfully';
+    document.getElementById("entry_form").reset();
     fetchEntries();
   }
 
@@ -330,35 +333,40 @@ async function fetchEntries(retries = 3) {
   }
 
   function budgetString2array(budget){
-    array = {}
-    console.log(budget)
+    array = {};
     budget.split(',').forEach((pair) =>{
-      const [key,value] = pair.split(':')
+      const [key,value] = pair.split(':');
       array[key] = value;
     });
     return array;
   }
 
   function getCurrentBudget(row){
+
     this_year = new Date().getFullYear();
     this_month = getMonthinWords(new Date().getMonth() +1)
 
     let filteredValues = row.filter(item => item.month === this_month && item.year === this_year)
-    budgetArray = budgetString2array(filteredValues[0].budget)
-    totalBudget = 0;
-    Object.keys(budgetArray).forEach(element =>{
+    console.log(filteredValues[0].budget)
+    if(filteredValues.length > 0){
+      budgetArray = filteredValues[0].budget
+      //  budgetString2array(filteredValues[0].budget)
+      totalBudget = 0;
+      Object.keys(budgetArray).forEach(element =>{
         totalBudget += Number(budgetArray[element])
-    })
-    console.log(totalBudget)
-    console.log(filteredValues)
-    summary = document.getElementById('budget_summary');
-
+      })
+      console.log(totalBudget)
+      console.log(filteredValues)
+      summary = document.getElementById('budget_summary');
+    }
+    else{
+      document.getElementById('budget_summary').innerHTML = "No Budget planned fot this month.."
+    }
     return ;
   }
 
   function displayBudget(entries) {
     console.log(entries)
-    getCurrentBudget(entries.budgetrow);
     
     let Body = document.getElementById('budget_display');
     
@@ -366,77 +374,123 @@ async function fetchEntries(retries = 3) {
     entries.budgetrow.forEach(entry => {
       Body = document.getElementById('budget_display');
       budget_date =entry.month+', '+entry.year;
-      //<div>
-      //  <strong>${entry.name}</strong>: $$totalSpent.toFixed(2)} / $${entr.budget_amount.toFixed(2)}
-      //    <div class="progress-bar">
-      //       <div class="progress" style="width: ${usagePercent}%;"></div>
-      //     </div>
-      //</div>
+      totalBudget = 0;
+      budgetArray = budgetString2array(entry.budget)
+      // console.log(budgetArray)/
+      Object.keys(budgetArray).forEach(element =>{
+        totalBudget += Number(budgetArray[element])
+      })
+      totalSpent = 0;
+      if(entries.expenserow != null){
+        entries.expenserow.forEach(expense =>{
+          expense.date = new Date(expense.date);
+          year = expense.date.getUTCFullYear() 
+          month = getMonthinWords(expense.date.getUTCMonth() + 1)
+          // entry.date = entry.date.getUTCFullYear() +  "/" + (entry.date.getUTCMonth() + 1) + "/" + entry.date.getUTCDate();
+          if(month == entry.month && year == entry.year){
+            totalSpent += Number(expense.amount);
+          }
+        })
+      }
+
+      const usagePercent = (totalSpent.toFixed(2) * 100)/totalBudget.toFixed(2);
 
       Body.innerHTML += `
-        <div style="width: 90%;display: flex;align-items: center;justify-content: space-between; margin-left: auto;margin-right: auto; max-width: 300px">
+        <div>
+          <div style="width: 90%;display: flex;align-items: center;justify-content: space-between; margin-left: auto;margin-right: auto; max-width: 300px">
           
-          <span style="font-weight: 800;text-transform: capitalize;">${entry.name}</span>
-          <div     style="display: flex;justify-content: space-between;width: 60%;align-items: center;">
-            <span style="margin-right: 40px;">${budget_date}</span>
-            <button onclick="document.getElementById(${entry.budget_id}).classList.toggle('show')">View</button>
+            <span style="font-weight: 800;text-transform: capitalize;">${entry.name}</span>
+            <div     style="display: flex;justify-content: space-between;width: 60%;align-items: center;">
+              <span style="margin-right: 40px;">${budget_date}</span>
+              <button onclick="document.getElementById(${entry.budget_id}).classList.toggle('show');document.getElementById('progress_bar${entry.budget_id}').classList.toggle('show')">View</button>
+            </div>
           </div>
-        </div>
-        <div style="display: none; width: fit-content;margin-left: auto;margin-right: auto; border: solid;padding: 5px;border-width: thin;" id="${entry.budget_id}">
+          <div style="display: none; width: fit-content;margin-left: auto;margin-right: auto; border: solid;padding: 5px;border-width: thin;" id="${entry.budget_id}">
+          </div>
+          <div id="progress_bar${entry.budget_id}" style="width: 90%;margin-left: auto;margin-right: auto;max-width: 300px;display:none" class="show">
+            <div class="progress_bar" >
+              <div class="progress" style="width: ${usagePercent}%;"></div>
+            </div>
+          </div>
         </div>
       `;
 
       entry.budget = budgetString2array(entry.budget);
       Body = document.getElementById(entry.budget_id);
       Body.innerHTML = '';
-      console.log(entry);
       Object.keys(entry.budget).forEach(key =>{
+        // if{
 
-        totalSpent = 0;
-        // entries.expenserow.forEach(expense =>{
-        //   expense.date = new Date(expense.date);
-        //   year = expense.date.getUTCFullYear() 
-        //   month = getMonthinWords(expense.date.getUTCMonth() + 1)
-        //   // entry.date = entry.date.getUTCFullYear() +  "/" + (entry.date.getUTCMonth() + 1) + "/" + entry.date.getUTCDate();
-        //   if(expense.category == key && month == entry.month && year == entry.year){
-        //     totalSpent += Number(expense.amount);
-        //   }
-        // })
+          catTotalSpent = 0;
+          if(entries.expenserow != null){
+            entries.expenserow.forEach(expense =>{
+              expense.date = new Date(expense.date);
+              year = expense.date.getUTCFullYear() 
+              month = getMonthinWords(expense.date.getUTCMonth() + 1)
+              // entry.date = entry.date.getUTCFullYear() +  "/" + (entry.date.getUTCMonth() + 1) + "/" + entry.date.getUTCDate();
+              if(month == entry.month && year == entry.year && expense.category == key){
+                catTotalSpent += Number(expense.amount);
+              }
+            })
+          }
 
-        if(entry.budget[key] > 0){
           Body.innerHTML +=`
-            <div> 
+            <div  ${(entry.budget[key] > 0) ? 'style=font-weight:bold; ': ''}>  
               <span>${key}</span>
-              <span>You $${totalSpent} Out Of  $${entry.budget[key]} budgeted</span>
+              <span>You spent $${catTotalSpent} Out Of  $${entry.budget[key]} budgeted</span>
             </div>
           `
-        }
+        // }
       })
     });
+
+    getCurrentBudget(entries.budgetrow);
+
   }
 
-  async function fetchBudget() {
+    
+
+  async function fetchBudget(retries = 3) {
     const token = localStorage.getItem('token');
-    const response = await fetch('/budget', {
-      method: 'GET',
-      headers: { Authorization: `Bearer ${token}` }
-    });
-    const entries = await response.json();
-    if(entries.message){
-        // document.getElementById('status').textContent = entries.message;
-        // document.getElementById('status').style.color = 'red';
-        console.log('entrieeeeeeeeee')
-        document.getElementById('budget_display').innerHTML = `
-          <span style="margin-left: auto;margin-right: auto;display: block;width: fit-content;">
-            You Have No Budget Planned Yet
-          </span>
-        ` ;
-        return;
-     }
-     else{
-        document.getElementById('status').textContent = '';
-     }
-    displayBudget(entries);
+    
+    for (let i = 0; i < retries; i++) {
+      try {
+        const response = await fetch('/budget', {
+          method: 'GET',
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        
+        if (response.ok){
+          const entries = await response.json();
+          console.log(entries)
+          if(entries.message){
+            document.getElementById('status').textContent = entries.message;
+            document.getElementById('status').style.color = 'red';
+            console.log('entrieeeeeeeeee')
+            document.getElementById('budget_display').innerHTML = `
+              <span style="margin-left: auto;margin-right: auto;display: block;width: fit-content;">
+                You Have No Budget Planned Yet
+              </span>
+            ` ;
+            return;
+          }
+          else{
+            document.getElementById('status').textContent = '';
+          }
+          displayBudget(entries);
+          return
+        }
+        else {
+          throw new Error
+        }
+      } catch (error) {
+        console.log(error);
+
+        console.log('Retrieve attempt '+ (i + 1)+' failed. Retrying...');
+        await new Promise(resolve => setTimeout(resolve, 2 ** i * 1000)); // Exponential backoff
+      }
+    }
+    console.error('Unable to fetch data after multiple attempts.');
   }
 
   async function addBudget(name,budget,month,year){
@@ -462,7 +516,7 @@ async function fetchEntries(retries = 3) {
     document.getElementById('budget_display').classList.add('show');
 
     document.getElementById('refresh_budget').classList.add('show');
-
+    document.getElementById('budgetForm').reset();
     // fetchBudget();
   }
 

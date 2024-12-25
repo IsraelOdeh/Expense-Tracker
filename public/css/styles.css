@@ -5,14 +5,14 @@
   body {
     font-family: Arial, sans-serif;
     height: 100vh;
-    background-color: #f4f4f4;
+    background-color: #656565bf;
     margin: 0;
   }
   
   .container {
     width: 100%;
     max-width: 510px;
-    background-color: #fff;
+    background-color: #312d2dbf;
     padding: 20px;
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
